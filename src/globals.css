@@ -1,0 +1,338 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light mode - softer neon-on-light palette */
+    --background: 220 20% 97%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 186 100% 40%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 215 28% 90%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 215 28% 90%;
+    --muted-foreground: 215 16% 40%;
+    --accent: 215 28% 90%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 215 20% 82%;
+    --input: 215 20% 82%;
+    --ring: 186 100% 40%;
+    --radius: 0.75rem;
+    --text-primary: #1E293B;
+    --text-secondary: #475569;
+    --text-placeholder: #94A3B8;
+    --text-muted: #CBD5E1;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      /* Dark mode - full neon/slate palette matching the app's design */
+      --background: 222 47% 4%;       /* slate-950 */
+      --foreground: 210 40% 98%;       /* near white */
+      --card: 222 47% 8%;             /* slate-900 */
+      --card-foreground: 210 40% 98%;
+      --popover: 222 47% 8%;
+      --popover-foreground: 210 40% 98%;
+      --primary: 186 100% 50%;         /* cyan-400 neon */
+      --primary-foreground: 222.2 47.4% 11.2%;
+      --secondary: 217 33% 17%;        /* slate-800 */
+      --secondary-foreground: 210 40% 98%;
+      --muted: 217 33% 17%;
+      --muted-foreground: 215 20% 65%;
+      --accent: 217 33% 17%;
+      --accent-foreground: 210 40% 98%;
+      --destructive: 0 63% 31%;
+      --destructive-foreground: 210 40% 98%;
+      --border: 217 33% 17%;
+      --input: 217 33% 17%;
+      --ring: 186 100% 50%;
+      --text-primary: #FFFFFF;
+      --text-secondary: #CBD5E1;
+      --text-placeholder: #94A3B8;
+      --text-muted: #64748B;
+    }
+  }
+
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Prevent text selection and callout on mobile for better native feel */
+  button,
+  a,
+  [role="button"],
+  [role="link"],
+  nav,
+  nav * {
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+  }
+
+  /* Fix text colors in all form inputs */
+  input,
+  textarea,
+  select {
+    color: var(--text-primary) !important;
+    caret-color: var(--text-primary) !important;
+  }
+
+  /* Allow explicit text-white on inputs to override the global rule */
+  input.text-white,
+  textarea.text-white {
+    color: white !important;
+    caret-color: white !important;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--text-placeholder) !important;
+    opacity: 1 !important;
+  }
+
+  /* Fix select dropdown text */
+  select option {
+    color: var(--text-primary) !important;
+    background-color: #1e293b !important;
+  }
+
+  /* Fix labels */
+  label {
+    color: var(--text-secondary) !important;
+  }
+
+  /* Radix UI Select components */
+  [role="option"],
+  [data-radix-select-viewport] {
+    color: var(--text-primary) !important;
+  }
+
+  /* Ensure all text on dark backgrounds is visible */
+  .bg-slate-900 *,
+  .bg-slate-800 *,
+  .bg-slate-950 * {
+    color: inherit;
+  }
+
+  /* Fix date inputs specifically */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    color: var(--text-primary) !important;
+    color-scheme: dark;
+  }
+
+  /* Fix number input spinners */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    opacity: 1;
+  }
+
+  /* Make sure disabled inputs are still readable */
+  input:disabled,
+  textarea:disabled,
+  select:disabled {
+    color: var(--text-muted) !important;
+    opacity: 0.6;
+  }
+}
+
+/* Mobile-first scrollbar styling */
+* {
+  -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on iOS */
+}
+
+/* Hide scrollbars on all platforms for clean mobile UI */
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
+/* Prevent overscroll bounce on non-body elements */
+body, html {
+  overscroll-behavior: none;
+}
+
+/* Neon glow animations */
+@keyframes neon-pulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3),
+                0 0 20px rgba(0, 255, 255, 0.2),
+                0 0 30px rgba(0, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.4),
+                0 0 30px rgba(0, 255, 255, 0.3),
+                0 0 45px rgba(0, 255, 255, 0.2);
+  }
+}
+
+.neon-pulse {
+  animation: neon-pulse 2s ease-in-out infinite;
+}
+
+/* Star twinkle animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.star {
+  animation: twinkle 3s ease-in-out infinite;
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(90deg, #06b6d4, #14b8a6, #22c55e);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* AI button pulse animation */
+@keyframes aiPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+}
+
+/* Safe area for mobile - iOS notch/home indicator support */
+.pb-safe {
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+}
+
+.pt-safe {
+  padding-top: max(env(safe-area-inset-top, 0px), 20px);
+}
+
+.px-safe {
+  padding-left: max(env(safe-area-inset-left, 0px), 16px);
+  padding-right: max(env(safe-area-inset-right, 0px), 16px);
+}
+
+/* mb-safe for content above sticky footers */
+.mb-safe {
+  margin-bottom: max(env(safe-area-inset-bottom, 0px), 20px);
+}
+
+/* Ensure content doesn't get hidden by notch - but allow scrolling */
+body {
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 0;
+  padding-right: 0;
+  min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+}
+
+/* iOS keyboard handling - prevent inputs from being hidden */
+/* This is handled via scroll-into-view on focus and proper form layout */
+@supports (-webkit-touch-callout: none) {
+  /* iOS-specific fixes */
+  input, textarea, select {
+    font-size: 16px !important; /* Prevent zoom on focus */
+  }
+  
+  /* Ensure modals and sheets work with iOS keyboard */
+  .sheet-content {
+    max-height: 100dvh;
+  }
+}
+
+/* Mobile-first tap targets - minimum 44x44px (Apple HIG standard) */
+button:not(.no-min-size):not(.inline), 
+a:not(.no-min-size):not(.inline), 
+[role="button"]:not(.no-min-size):not(.inline) {
+  min-height: 44px;
+}
+
+/* Ensure icon buttons have proper touch targets */
+button[aria-label]:not(.no-min-size) {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Smooth scroll behavior for mobile */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Prevent zoom on iOS when focusing inputs */
+@media (max-width: 640px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Improve tap highlight */
+* {
+  -webkit-tap-highlight-color: rgba(6, 182, 212, 0.1);
+}
+
+/* Input styling */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Force date input text to be visible on dark backgrounds */
+input[type="date"] {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+input[type="date"]::-webkit-datetime-edit {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(6, 182, 212, 0.3);
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
