@@ -4,13 +4,9 @@ const isNativePlatform = () => Capacitor.isNativePlatform();
 const isIOS = () => Capacitor.getPlatform() === 'ios';
 const plugins = Capacitor?.Plugins ?? {};
 const statusBar = plugins.StatusBar;
+const keyboard = plugins.Keyboard;
 const splashScreen = plugins.SplashScreen;
 const haptics = plugins.Haptics;
-const isLikelyIOSSimulator = () =>
-  isIOS() &&
-  /Simulator|x86_64|iPhone Simulator|iPad Simulator/i.test(
-    globalThis?.navigator?.userAgent ?? ''
-  );
 
 export async function setupNativeShell() {
   if (!isNativePlatform()) return;
@@ -31,6 +27,14 @@ export async function setupNativeShell() {
         style: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'DARK' : 'LIGHT',
       });
       await statusBar.setBackgroundColor?.({ color: '#020617' });
+    } catch {}
+  }
+
+  if (keyboard) {
+    try {
+      await keyboard.setResizeMode?.({ mode: 'body' });
+      await keyboard.setScroll?.({ isDisabled: false });
+      await keyboard.setAccessoryBarVisible?.({ isVisible: true });
     } catch {}
   }
 
@@ -55,16 +59,12 @@ export async function syncStatusBarStyle(isDarkMode) {
 
 async function impact(style = 'LIGHT') {
   try {
-    if (isLikelyIOSSimulator()) {
-      return;
-    }
-
     if (isNativePlatform() && haptics?.impact) {
       await haptics.impact({ style });
       return;
     }
 
-    if (!isIOS() && navigator.vibrate) navigator.vibrate(10);
+    if (navigator.vibrate) navigator.vibrate(10);
   } catch {}
 }
 
