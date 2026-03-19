@@ -109,7 +109,6 @@ export default function MobileSelect({
                   onChange={(e) => setSearch(e.target.value)}
                   placeholder="Search..."
                   className="bg-transparent text-white flex-1 outline-none text-base placeholder:text-slate-500"
-                  autoFocus
                 />
               </div>
             </div>
