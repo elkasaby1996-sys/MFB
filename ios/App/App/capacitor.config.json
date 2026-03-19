@@ -9,8 +9,6 @@
 		"scrollEnabled": true
 	},
 	"server": {
-		"url": "https://my-finance-bro-c7438db0.base44.app",
-		"cleartext": false,
 		"androidScheme": "https"
 	},
 	"packageClassList": []
