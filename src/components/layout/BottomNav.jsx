@@ -11,6 +11,7 @@ import {
   Plus
 } from "lucide-react";
 import { motion } from 'framer-motion';
+import { nativeHaptics } from '@/lib/native';
 
 const NAV_ITEMS = [
   { name: 'Home', icon: Home, page: 'Dashboard', path: '/Dashboard' },
@@ -155,7 +156,7 @@ export default function BottomNav({ currentPage }) {
   // ── Tab click ──────────────────────────────────────────────────────────────
   const handleTabClick = useCallback((e, item) => {
     e.preventDefault();
-    if (navigator.vibrate) navigator.vibrate(10);
+    nativeHaptics.tap();
     // Expand nav immediately on tap
     setCompactSafe(false);
     const currentPageTab = getTabForPage(location.pathname);
@@ -183,7 +184,7 @@ export default function BottomNav({ currentPage }) {
       role="navigation"
       aria-label="Main navigation"
       className="fixed left-0 right-0 z-50"
-      style={{ bottom: '34px' }}
+      style={{ bottom: 'max(16px, calc(env(safe-area-inset-bottom) + 8px))' }}
     >
       <div
         style={{
@@ -248,7 +249,7 @@ export default function BottomNav({ currentPage }) {
 
           <button
             onClick={() => {
-              if (navigator.vibrate) navigator.vibrate(10);
+              nativeHaptics.tap();
               const event = new CustomEvent('quickAddClick');
               window.dispatchEvent(event);
             }}
