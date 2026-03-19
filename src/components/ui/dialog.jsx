@@ -17,8 +17,7 @@ const DialogClose = DialogPrimitive.Close
 const hasDialogPrimitive = (children, displayName) =>
   React.Children.toArray(children).some((child) => {
     if (!React.isValidElement(child)) return false
-    if (child.type?.displayName === displayName) return true
-    return hasDialogPrimitive(child.props?.children, displayName)
+    return child.type?.displayName === displayName
   })
 
 const DialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
