@@ -1,5 +1,5 @@
 import './App.css'
-import React, { Suspense } from 'react';
+import React from 'react';
 import * as Sentry from "@sentry/react";
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
@@ -12,7 +12,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { LazyPageLoader } from '@/lib/LazyPageLoader';
-import { Loader2 } from 'lucide-react';
+import { syncStatusBarStyle } from '@/lib/native';
 
 Sentry.init({
   dsn: "https://3275d19880d1f166032269188ce027ac@o4511053095108608.ingest.de.sentry.io/4511053102383184", // Safe to expose - Sentry DSNs are public by design
@@ -41,7 +41,7 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   : <>{children}</>;
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, isAuthenticated, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -102,6 +102,20 @@ const SentryFallback = () => (
 );
 
 function App() {
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const updateStatusBar = (event) => {
+      syncStatusBarStyle(event.matches);
+    };
+
+    syncStatusBarStyle(mediaQuery.matches);
+    mediaQuery.addEventListener?.('change', updateStatusBar);
+
+    return () => {
+      mediaQuery.removeEventListener?.('change', updateStatusBar);
+    };
+  }, []);
+
   return (
     <Sentry.ErrorBoundary fallback={<SentryFallback />}>
       <AuthProvider>
