@@ -12,6 +12,7 @@ import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { LazyPageLoader } from '@/lib/LazyPageLoader';
+import { syncStatusBarStyle } from '@/lib/native';
 
 Sentry.init({
   dsn: "https://3275d19880d1f166032269188ce027ac@o4511053095108608.ingest.de.sentry.io/4511053102383184", // Safe to expose - Sentry DSNs are public by design
@@ -101,6 +102,20 @@ const SentryFallback = () => (
 );
 
 function App() {
+  React.useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const updateStatusBar = (event) => {
+      syncStatusBarStyle(event.matches);
+    };
+
+    syncStatusBarStyle(mediaQuery.matches);
+    mediaQuery.addEventListener?.('change', updateStatusBar);
+
+    return () => {
+      mediaQuery.removeEventListener?.('change', updateStatusBar);
+    };
+  }, []);
+
   return (
     <Sentry.ErrorBoundary fallback={<SentryFallback />}>
       <AuthProvider>
