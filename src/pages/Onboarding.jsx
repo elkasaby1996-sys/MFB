@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -40,6 +40,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  const [existingProfileId, setExistingProfileId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     country: "",
@@ -59,6 +60,21 @@ export default function Onboarding() {
         if (profiles && profiles.length > 0 && profiles[0].onboarding_completed) {
           // Already completed, redirect to dashboard
           navigate(createPageUrl("Dashboard"));
+        } else if (profiles && profiles.length > 0) {
+          const profile = profiles[0];
+          setExistingProfileId(profile.id);
+          setFormData(prev => ({
+            ...prev,
+            name: profile.name || "",
+            country: profile.country || "",
+            currency: profile.currency || prev.currency,
+            age_range: profile.age_range || "",
+            monthly_income: profile.monthly_income?.toString?.() || "",
+            financial_goal: profile.financial_goal || "",
+            savings_target: profile.savings_target?.toString?.() || "",
+            avatar: profile.avatar || prev.avatar,
+          }));
+          setCheckingOnboarding(false);
         } else {
           setCheckingOnboarding(false);
         }
@@ -83,7 +99,7 @@ export default function Onboarding() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      await base44.entities.UserProfile.create({
+      const profilePayload = {
         ...formData,
         monthly_income: parseFloat(formData.monthly_income) || 0,
         savings_target: parseFloat(formData.savings_target) || 0,
@@ -92,35 +108,56 @@ export default function Onboarding() {
         streak_days: 1,
         onboarding_completed: false,
         plan_tier: "free",
-      });
+      };
+
+      if (existingProfileId) {
+        await base44.entities.UserProfile.update(existingProfileId, profilePayload);
+      } else {
+        const createdProfile = await base44.entities.UserProfile.create(profilePayload);
+        setExistingProfileId(createdProfile?.id || null);
+      }
       
       // Show upgrade screen (do NOT set onboarding_completed yet)
       setStep(5);
     } catch (error) {
-      console.error("Error saving profile:", error);
+      console.error("Error saving profile:", {
+        message: error?.message,
+        details: error?.response?.data ?? error,
+      });
     }
     setLoading(false);
   };
 
-  const handleUpgradeTier = async (tier, appleTransactionId = null) => {
+  const handleUpgradeTier = useCallback(async (tier, appleTransactionId = null) => {
     // Only used for 'free' (Continue with Free). Pro/Elite are updated ONLY after Apple payment confirmation.
     try {
-      const profiles = await base44.entities.UserProfile.list();
-      if (profiles && profiles.length > 0) {
+      let profileId = existingProfileId;
+      if (!profileId) {
+        const profiles = await base44.entities.UserProfile.list();
+        profileId = profiles?.[0]?.id || null;
+        if (profileId) {
+          setExistingProfileId(profileId);
+        }
+      }
+
+      if (profileId) {
         const updateData = { plan_tier: tier, onboarding_completed: true };
         if (appleTransactionId) {
           updateData.apple_original_transaction_id = appleTransactionId;
         }
-        await base44.entities.UserProfile.update(profiles[0].id, updateData);
+        await base44.entities.UserProfile.update(profileId, updateData);
       }
       // Mark onboarding as completed in localStorage
       await OnboardingService.setCompleted(true);
       navigate(createPageUrl("Dashboard"));
     } catch (error) {
-      console.error("Error updating tier:", error);
+      console.error("Error updating tier:", {
+        message: error?.message,
+        details: error?.response?.data ?? error,
+      });
       navigate(createPageUrl("Dashboard"));
     }
-  };
+  }, [existingProfileId, navigate]);
 
   // Listen for iOS/Android purchase result — validate server-side before granting tier
   useEffect(() => {
