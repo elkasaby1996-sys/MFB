@@ -1,0 +1,17 @@
+{
+	"appId": "com.syslab.myfinancebro",
+	"appName": "MyFinanceBro",
+	"webDir": "dist",
+	"backgroundColor": "#020617",
+	"ios": {
+		"contentInset": "never",
+		"allowsLinkPreview": false,
+		"scrollEnabled": true
+	},
+	"server": {
+		"url": "https://my-finance-bro-c7438db0.base44.app",
+		"cleartext": false,
+		"androidScheme": "https"
+	},
+	"packageClassList": []
+}
