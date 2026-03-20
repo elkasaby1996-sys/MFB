@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
@@ -16,7 +16,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CURRENCIES } from '@/components/constants/currencies';
 import { COUNTRIES } from '@/components/constants/countries';
 import { toast } from 'sonner';
-import { BASE44_APP_URL, logBase44Debug, logBase44Error } from '@/lib/base44-config';
 
 
 const GOALS = [
@@ -41,7 +40,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
-  const [onboardingError, setOnboardingError] = useState(null);
+  const [existingProfileId, setExistingProfileId] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     country: "",
@@ -65,10 +64,7 @@ export default function Onboarding() {
     const detail = `${title}: ${message}`;
 
     setOnboardingError(detail);
-    logBase44Error(title, error, {
-      onboardingStep: step,
-      backendUrl: BASE44_APP_URL,
-    });
+    console.error(detail, error);
     toast.error(detail);
   };
 
@@ -83,6 +79,21 @@ export default function Onboarding() {
         if (profiles && profiles.length > 0 && profiles[0].onboarding_completed) {
           // Already completed, redirect to dashboard
           navigate(createPageUrl("Dashboard"));
+        } else if (profiles && profiles.length > 0) {
+          const profile = profiles[0];
+          setExistingProfileId(profile.id);
+          setFormData(prev => ({
+            ...prev,
+            name: profile.name || "",
+            country: profile.country || "",
+            currency: profile.currency || prev.currency,
+            age_range: profile.age_range || "",
+            monthly_income: profile.monthly_income?.toString?.() || "",
+            financial_goal: profile.financial_goal || "",
+            savings_target: profile.savings_target?.toString?.() || "",
+            avatar: profile.avatar || prev.avatar,
+          }));
+          setCheckingOnboarding(false);
         } else {
           setOnboardingError(null);
           setCheckingOnboarding(false);
@@ -109,12 +120,7 @@ export default function Onboarding() {
     setLoading(true);
     setOnboardingError(null);
     try {
-      logBase44Debug('Creating onboarding profile', {
-        backendUrl: BASE44_APP_URL,
-        hasName: Boolean(formData.name),
-        country: formData.country,
-      });
-      await base44.entities.UserProfile.create({
+      const profilePayload = {
         ...formData,
         monthly_income: parseFloat(formData.monthly_income) || 0,
         savings_target: parseFloat(formData.savings_target) || 0,
@@ -123,40 +129,56 @@ export default function Onboarding() {
         streak_days: 1,
         onboarding_completed: false,
         plan_tier: "free",
-      });
+      };
+
+      if (existingProfileId) {
+        await base44.entities.UserProfile.update(existingProfileId, profilePayload);
+      } else {
+        const createdProfile = await base44.entities.UserProfile.create(profilePayload);
+        setExistingProfileId(createdProfile?.id || null);
+      }
       
       // Show upgrade screen (do NOT set onboarding_completed yet)
       setStep(5);
     } catch (error) {
-      showOnboardingError('Error saving profile', error);
+      console.error("Error saving profile:", {
+        message: error?.message,
+        details: error?.response?.data ?? error,
+      });
     }
     setLoading(false);
   };
 
-  const handleUpgradeTier = async (tier, appleTransactionId = null) => {
+  const handleUpgradeTier = useCallback(async (tier, appleTransactionId = null) => {
     // Only used for 'free' (Continue with Free). Pro/Elite are updated ONLY after Apple payment confirmation.
     try {
-      setOnboardingError(null);
-      logBase44Debug('Finalizing onboarding tier', {
-        backendUrl: BASE44_APP_URL,
-        tier,
-        hasAppleTransactionId: Boolean(appleTransactionId),
-      });
-      const profiles = await base44.entities.UserProfile.list();
-      if (profiles && profiles.length > 0) {
+      let profileId = existingProfileId;
+      if (!profileId) {
+        const profiles = await base44.entities.UserProfile.list();
+        profileId = profiles?.[0]?.id || null;
+        if (profileId) {
+          setExistingProfileId(profileId);
+        }
+      }
+
+      if (profileId) {
         const updateData = { plan_tier: tier, onboarding_completed: true };
         if (appleTransactionId) {
           updateData.apple_original_transaction_id = appleTransactionId;
         }
-        await base44.entities.UserProfile.update(profiles[0].id, updateData);
+        await base44.entities.UserProfile.update(profileId, updateData);
       }
       // Mark onboarding as completed in localStorage
       await OnboardingService.setCompleted(true);
       navigate(createPageUrl("Dashboard"));
     } catch (error) {
-      showOnboardingError('Error finalizing onboarding', error);
+      console.error("Error updating tier:", {
+        message: error?.message,
+        details: error?.response?.data ?? error,
+      });
+      navigate(createPageUrl("Dashboard"));
     }
-  };
+  }, [existingProfileId, navigate]);
 
   // Listen for iOS/Android purchase result — validate server-side before granting tier
   useEffect(() => {
