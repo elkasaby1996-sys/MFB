@@ -14,6 +14,7 @@ import QuickAddSheet from '@/components/ui/QuickAddSheet';
 import AddTransactionModal from '@/components/dashboard/AddTransactionModal';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { isNativePlatform } from '@/lib/native';
 
 
 function useIOSPWASetup() {
@@ -22,7 +23,7 @@ function useIOSPWASetup() {
     const tags = [
       { name: 'apple-mobile-web-app-capable', content: 'yes' },
       { name: 'apple-mobile-web-app-status-bar-style', content: 'black-translucent' },
-      { name: 'apple-mobile-web-app-title', content: 'Finflow' },
+      { name: 'apple-mobile-web-app-title', content: 'MyFinanceBro' },
       { name: 'mobile-web-app-capable', content: 'yes' },
       { name: 'theme-color', content: '#0a0f1e' },
       { name: 'format-detection', content: 'telephone=no' },
@@ -43,6 +44,9 @@ function useIOSPWASetup() {
     // Prevent bounce/overscroll on iOS
     document.body.style.overscrollBehavior = 'none';
     document.documentElement.style.overscrollBehavior = 'none';
+    if (isNativePlatform()) {
+      document.body.classList.add('native-app');
+    }
   }, []);
 }
 

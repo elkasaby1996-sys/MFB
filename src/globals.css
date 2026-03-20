@@ -67,6 +67,13 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    min-width: 320px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
   }
 
   /* Prevent text selection and callout on mobile for better native feel */
@@ -79,6 +86,7 @@
     -webkit-user-select: none;
     user-select: none;
     -webkit-touch-callout: none;
+    touch-action: manipulation;
   }
 
   /* Fix text colors in all form inputs */
@@ -169,6 +177,12 @@ body, html {
   overscroll-behavior: none;
 }
 
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
 /* Neon glow animations */
 @keyframes neon-pulse {
   0%, 100% {
@@ -248,6 +262,15 @@ body {
 /* This is handled via scroll-into-view on focus and proper form layout */
 @supports (-webkit-touch-callout: none) {
   /* iOS-specific fixes */
+  html {
+    height: -webkit-fill-available;
+  }
+
+  body,
+  #root {
+    min-height: -webkit-fill-available;
+  }
+
   input, textarea, select {
     font-size: 16px !important; /* Prevent zoom on focus */
   }
@@ -256,6 +279,14 @@ body {
   .sheet-content {
     max-height: 100dvh;
   }
+}
+
+.native-shell body {
+  background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+}
+
+.platform-ios body {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Mobile-first tap targets - minimum 44x44px (Apple HIG standard) */

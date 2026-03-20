@@ -1,16 +1,14 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ArrowDownRight, ArrowUpRight } from 'lucide-react';
+import { nativeHaptics } from '@/lib/native';
 
 /**
  * Bottom sheet for quick transaction type selection
  */
 export default function QuickAddSheet({ isOpen, onClose, onSelectType }) {
   const handleSelect = (type) => {
-    // Light haptic feedback
-    if (navigator.vibrate) {
-      navigator.vibrate(10);
-    }
+    nativeHaptics.tap();
     onSelectType(type);
     onClose();
   };
