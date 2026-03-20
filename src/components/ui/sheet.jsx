@@ -14,6 +14,13 @@ const SheetClose = SheetPrimitive.Close
 
 const SheetPortal = SheetPrimitive.Portal
 
+const hasSheetPrimitive = (children, displayName) =>
+  React.Children.toArray(children).some((child) => {
+    if (!React.isValidElement(child)) return false
+    if (child.type?.displayName === displayName) return true
+    return hasSheetPrimitive(child.props?.children, displayName)
+  })
+
 const SheetOverlay = React.forwardRef(({ className, ...props }, ref) => (
   <SheetPrimitive.Overlay
     className={cn(
@@ -44,25 +51,36 @@ const sheetVariants = cva(
   }
 )
 
-const SheetContent = React.forwardRef(({ side = "right", className, children, hideClose = false, ...props }, ref) => (
-  <SheetPortal>
-    <SheetOverlay />
-    <SheetPrimitive.Content ref={ref} className={cn(sheetVariants({ side }), className)} {...props}>
-      {!hideClose && (
-        <SheetPrimitive.Close
-          className={cn(
-            "absolute rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary",
-            side === "bottom" ? "right-6 top-6 z-10" : "right-4 top-4"
-          )}
-        >
-          <X className="h-5 w-5" />
-          <span className="sr-only">Close</span>
-        </SheetPrimitive.Close>
-      )}
-      {children}
-    </SheetPrimitive.Content>
-  </SheetPortal>
-))
+const SheetContent = React.forwardRef(({ side = "right", className, children, hideClose = false, ...props }, ref) => {
+  const hasTitle = hasSheetPrimitive(children, SheetTitle.displayName)
+  const hasDescription = hasSheetPrimitive(children, SheetDescription.displayName)
+  const { ['aria-describedby']: ariaDescribedBy, ...contentProps } = props
+
+  return (
+    <SheetPortal>
+      <SheetOverlay />
+      <SheetPrimitive.Content
+        ref={ref}
+        aria-describedby={hasDescription ? ariaDescribedBy : undefined}
+        className={cn(sheetVariants({ side }), className)}
+        {...contentProps}>
+        {!hideClose && (
+          <SheetPrimitive.Close
+            className={cn(
+              "absolute rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary",
+              side === "bottom" ? "right-6 top-6 z-10" : "right-4 top-4"
+            )}
+          >
+            <X className="h-5 w-5" />
+            <span className="sr-only">Close</span>
+          </SheetPrimitive.Close>
+        )}
+        {!hasTitle && <SheetTitle className="sr-only">Sheet</SheetTitle>}
+        {children}
+      </SheetPrimitive.Content>
+    </SheetPortal>
+  )
+})
 SheetContent.displayName = SheetPrimitive.Content.displayName
 
 const SheetHeader = ({
