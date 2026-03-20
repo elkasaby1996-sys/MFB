@@ -1,3 +1,5 @@
+import { BASE44_APP_ID, BASE44_APP_URL, BASE44_RUNTIME, logBase44Debug } from '@/lib/base44-config';
+
 const isNode = typeof window === 'undefined';
 const windowObj = isNode ? { localStorage: new Map() } : window;
 const storage = windowObj.localStorage;
@@ -40,8 +42,8 @@ const getAppParams = () => {
 		storage.removeItem('token');
 	}
 	return {
-		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
-		serverUrl: getAppParamValue("server_url", { defaultValue: import.meta.env.VITE_BASE44_BACKEND_URL }),
+		appId: getAppParamValue("app_id", { defaultValue: BASE44_APP_ID }),
+		serverUrl: getAppParamValue("server_url", { defaultValue: BASE44_APP_URL }),
 		token: getAppParamValue("access_token", { removeFromUrl: true }),
 		fromUrl: getAppParamValue("from_url", { defaultValue: window.location.href }),
 		functionsVersion: getAppParamValue("functions_version"),
@@ -51,4 +53,14 @@ const getAppParams = () => {
 
 export const appParams = {
 	...getAppParams()
+}
+
+if (!isNode) {
+	logBase44Debug('Resolved Base44 app params', {
+		runtime: BASE44_RUNTIME,
+		appId: appParams.appId,
+		serverUrl: appParams.serverUrl,
+		hasToken: Boolean(appParams.token),
+		functionsVersion: appParams.functionsVersion || 'default',
+	});
 }

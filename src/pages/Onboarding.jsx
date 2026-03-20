@@ -72,6 +72,9 @@ export default function Onboarding() {
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
+        logBase44Debug('Checking onboarding profile state', {
+          backendUrl: BASE44_APP_URL,
+        });
         const profiles = await base44.entities.UserProfile.list();
         if (profiles && profiles.length > 0 && profiles[0].onboarding_completed) {
           // Already completed, redirect to dashboard
