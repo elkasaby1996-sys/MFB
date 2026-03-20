@@ -16,8 +16,6 @@ const config: CapacitorConfig = {
     scrollEnabled: true,
   },
   server: {
-    url: base44AppUrl,
-    cleartext: false,
     androidScheme: 'https',
   },
 };
