@@ -11,7 +11,6 @@ import { pagesConfig } from './pages.config'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import { LazyPageLoader } from '@/lib/LazyPageLoader';
 import { syncStatusBarStyle } from '@/lib/native';
 
@@ -36,6 +35,7 @@ const CashFlow = LazyPageLoader(() => import('./pages/CashFlow'));
 
 // Use existing pages from pagesConfig
 const MainPage = mainPageKey ? Pages[mainPageKey] : () => <></>;
+const OnboardingPage = Pages.Onboarding;
 
 const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
@@ -56,7 +56,11 @@ const AuthenticatedApp = () => {
   // Handle authentication errors
   if (authError) {
     if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
+      return (
+        <LayoutWrapper currentPageName="Onboarding">
+          <OnboardingPage />
+        </LayoutWrapper>
+      );
     } else if (authError.type === 'auth_required') {
       // Redirect to login automatically
       navigateToLogin();
