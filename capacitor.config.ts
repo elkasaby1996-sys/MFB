@@ -3,11 +3,16 @@ import type { CapacitorConfig } from '@capacitor/cli';
 const config: CapacitorConfig = {
   appId: 'com.syslab.myfinancebro',
   appName: 'MyFinanceBro',
-  webDir: 'dist'
-    server: {
-        url: 'https://my-finance-bro-c7438db0.base44.app' ,
-        cleartext: false
-    }
+  webDir: 'dist',
+  backgroundColor: '#020617',
+  ios: {
+    contentInset: 'never',
+    allowsLinkPreview: false,
+    scrollEnabled: true,
+  },
+  server: {
+    androidScheme: 'https',
+  },
 };
 
 export default config;

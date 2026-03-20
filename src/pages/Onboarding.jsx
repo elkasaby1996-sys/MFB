@@ -11,11 +11,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OnboardingService } from '@/components/services/OnboardingService';
 import MobileSelect from '@/components/ui/MobileSelect';
-import { Slider } from "@/components/ui/slider";
-import { ChevronRight, ChevronLeft, Rocket, User, DollarSign, Target, Sparkles } from "lucide-react";
+import { ChevronRight, ChevronLeft, Rocket, User, DollarSign, Target, Sparkles, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CURRENCIES } from '@/components/constants/currencies';
 import { COUNTRIES } from '@/components/constants/countries';
+import { toast } from 'sonner';
+import { BASE44_APP_URL, logBase44Debug, logBase44Error } from '@/lib/base44-config';
 
 
 const GOALS = [
@@ -40,6 +41,7 @@ export default function Onboarding() {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  const [onboardingError, setOnboardingError] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     country: "",
@@ -51,19 +53,42 @@ export default function Onboarding() {
     avatar: "green-suit",
   });
 
+  const getErrorMessage = (error) => {
+    if (error?.response?.data?.message) return error.response.data.message;
+    if (error?.data?.message) return error.data.message;
+    if (error?.message) return error.message;
+    return 'Something went wrong during onboarding.';
+  };
+
+  const showOnboardingError = (title, error) => {
+    const message = getErrorMessage(error);
+    const detail = `${title}: ${message}`;
+
+    setOnboardingError(detail);
+    logBase44Error(title, error, {
+      onboardingStep: step,
+      backendUrl: BASE44_APP_URL,
+    });
+    toast.error(detail);
+  };
+
   // Check if onboarding is already completed
   useEffect(() => {
     const checkOnboarding = async () => {
       try {
+        logBase44Debug('Checking onboarding profile state', {
+          backendUrl: BASE44_APP_URL,
+        });
         const profiles = await base44.entities.UserProfile.list();
         if (profiles && profiles.length > 0 && profiles[0].onboarding_completed) {
           // Already completed, redirect to dashboard
           navigate(createPageUrl("Dashboard"));
         } else {
+          setOnboardingError(null);
           setCheckingOnboarding(false);
         }
       } catch (error) {
-        console.error("Error checking onboarding:", error);
+        showOnboardingError('Error checking onboarding', error);
         setCheckingOnboarding(false);
       }
     };
@@ -82,7 +107,13 @@ export default function Onboarding() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setOnboardingError(null);
     try {
+      logBase44Debug('Creating onboarding profile', {
+        backendUrl: BASE44_APP_URL,
+        hasName: Boolean(formData.name),
+        country: formData.country,
+      });
       await base44.entities.UserProfile.create({
         ...formData,
         monthly_income: parseFloat(formData.monthly_income) || 0,
@@ -97,7 +128,7 @@ export default function Onboarding() {
       // Show upgrade screen (do NOT set onboarding_completed yet)
       setStep(5);
     } catch (error) {
-      console.error("Error saving profile:", error);
+      showOnboardingError('Error saving profile', error);
     }
     setLoading(false);
   };
@@ -105,6 +136,12 @@ export default function Onboarding() {
   const handleUpgradeTier = async (tier, appleTransactionId = null) => {
     // Only used for 'free' (Continue with Free). Pro/Elite are updated ONLY after Apple payment confirmation.
     try {
+      setOnboardingError(null);
+      logBase44Debug('Finalizing onboarding tier', {
+        backendUrl: BASE44_APP_URL,
+        tier,
+        hasAppleTransactionId: Boolean(appleTransactionId),
+      });
       const profiles = await base44.entities.UserProfile.list();
       if (profiles && profiles.length > 0) {
         const updateData = { plan_tier: tier, onboarding_completed: true };
@@ -117,8 +154,7 @@ export default function Onboarding() {
       await OnboardingService.setCompleted(true);
       navigate(createPageUrl("Dashboard"));
     } catch (error) {
-      console.error("Error updating tier:", error);
-      navigate(createPageUrl("Dashboard"));
+      showOnboardingError('Error finalizing onboarding', error);
     }
   };
 
@@ -128,6 +164,7 @@ export default function Onboarding() {
       const { success, productId, receiptData, transactionId } = event.detail;
       if (success && receiptData) {
         try {
+          setOnboardingError(null);
           const res = await base44.functions.invoke('validateAppleReceipt', {
             receipt_data: receiptData,
             product_id: productId,
@@ -139,7 +176,8 @@ export default function Onboarding() {
             // Validation failed — proceed as free so user isn't stuck
             await handleUpgradeTier('free');
           }
-        } catch {
+        } catch (error) {
+          showOnboardingError('Purchase validation failed', error);
           await handleUpgradeTier('free');
         }
       } else if (success && !receiptData) {
@@ -226,6 +264,33 @@ export default function Onboarding() {
 
         {/* Form Steps */}
         <div className="flex-1 max-w-md mx-auto w-full">
+          {onboardingError && (
+            <div className="mb-4 rounded-2xl border border-red-500/40 bg-red-500/10 p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-5 w-5 text-red-400 shrink-0" />
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-red-300">Onboarding hit an error</p>
+                  <p className="text-sm text-red-100 break-words">{onboardingError}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <NeonButton
+                      variant="ghost"
+                      className="text-red-100 border-red-400/30"
+                      onClick={() => navigator.clipboard?.writeText(onboardingError)}
+                    >
+                      Copy Error
+                    </NeonButton>
+                    <NeonButton
+                      variant="ghost"
+                      className="text-red-100 border-red-400/30"
+                      onClick={() => setOnboardingError(null)}
+                    >
+                      Dismiss
+                    </NeonButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
