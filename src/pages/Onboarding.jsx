@@ -11,11 +11,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { OnboardingService } from '@/components/services/OnboardingService';
 import MobileSelect from '@/components/ui/MobileSelect';
-import { Slider } from "@/components/ui/slider";
-import { ChevronRight, ChevronLeft, Rocket, User, DollarSign, Target, Sparkles } from "lucide-react";
+import { ChevronRight, ChevronLeft, Rocket, User, DollarSign, Target, Sparkles, AlertTriangle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CURRENCIES } from '@/components/constants/currencies';
 import { COUNTRIES } from '@/components/constants/countries';
+import { toast } from 'sonner';
 
 
 const GOALS = [
@@ -52,6 +52,22 @@ export default function Onboarding() {
     avatar: "green-suit",
   });
 
+  const getErrorMessage = (error) => {
+    if (error?.response?.data?.message) return error.response.data.message;
+    if (error?.data?.message) return error.data.message;
+    if (error?.message) return error.message;
+    return 'Something went wrong during onboarding.';
+  };
+
+  const showOnboardingError = (title, error) => {
+    const message = getErrorMessage(error);
+    const detail = `${title}: ${message}`;
+
+    setOnboardingError(detail);
+    console.error(detail, error);
+    toast.error(detail);
+  };
+
   // Check if onboarding is already completed
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -76,10 +92,11 @@ export default function Onboarding() {
           }));
           setCheckingOnboarding(false);
         } else {
+          setOnboardingError(null);
           setCheckingOnboarding(false);
         }
       } catch (error) {
-        console.error("Error checking onboarding:", error);
+        showOnboardingError('Error checking onboarding', error);
         setCheckingOnboarding(false);
       }
     };
@@ -98,6 +115,7 @@ export default function Onboarding() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    setOnboardingError(null);
     try {
       const profilePayload = {
         ...formData,
@@ -165,6 +183,7 @@ export default function Onboarding() {
       const { success, productId, receiptData, transactionId } = event.detail;
       if (success && receiptData) {
         try {
+          setOnboardingError(null);
           const res = await base44.functions.invoke('validateAppleReceipt', {
             receipt_data: receiptData,
             product_id: productId,
@@ -176,7 +195,8 @@ export default function Onboarding() {
             // Validation failed — proceed as free so user isn't stuck
             await handleUpgradeTier('free');
           }
-        } catch {
+        } catch (error) {
+          showOnboardingError('Purchase validation failed', error);
           await handleUpgradeTier('free');
         }
       } else if (success && !receiptData) {
@@ -263,6 +283,33 @@ export default function Onboarding() {
 
         {/* Form Steps */}
         <div className="flex-1 max-w-md mx-auto w-full">
+          {onboardingError && (
+            <div className="mb-4 rounded-2xl border border-red-500/40 bg-red-500/10 p-4">
+              <div className="flex items-start gap-3">
+                <AlertTriangle className="mt-0.5 h-5 w-5 text-red-400 shrink-0" />
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold text-red-300">Onboarding hit an error</p>
+                  <p className="text-sm text-red-100 break-words">{onboardingError}</p>
+                  <div className="flex flex-wrap gap-2">
+                    <NeonButton
+                      variant="ghost"
+                      className="text-red-100 border-red-400/30"
+                      onClick={() => navigator.clipboard?.writeText(onboardingError)}
+                    >
+                      Copy Error
+                    </NeonButton>
+                    <NeonButton
+                      variant="ghost"
+                      className="text-red-100 border-red-400/30"
+                      onClick={() => setOnboardingError(null)}
+                    >
+                      Dismiss
+                    </NeonButton>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             <motion.div
               key={step}
