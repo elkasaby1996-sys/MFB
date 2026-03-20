@@ -8,7 +8,7 @@ export class ErrorBoundary extends React.Component {
     this.state = { hasError: false, error: null, errorInfo: null };
   }
 
-  static getDerivedStateFromError(error) {
+  static getDerivedStateFromError(_error) {
     return { hasError: true };
   }
 
@@ -16,7 +16,7 @@ export class ErrorBoundary extends React.Component {
     this.setState({ error, errorInfo });
     
     // Log to console in development (no sensitive data)
-    if (process.env.NODE_ENV === 'development') {
+    if (import.meta.env.DEV) {
       console.error('ErrorBoundary caught an error:', error, errorInfo);
     }
     
@@ -34,7 +34,7 @@ export class ErrorBoundary extends React.Component {
         };
         // Only log sanitized error
         console.log('Error logged (sanitized):', errorData);
-      } catch (e) {
+      } catch {
         // Fail silently - analytics should never crash the app
       }
     }
@@ -57,7 +57,7 @@ export class ErrorBoundary extends React.Component {
                 The app encountered an unexpected error. Don't worry, your data is safe.
               </p>
               
-              {process.env.NODE_ENV === 'development' && this.state.error && (
+              {import.meta.env.DEV && this.state.error && (
                 <div className="mb-6 p-4 bg-slate-800 rounded-lg text-left">
                   <p className="text-red-400 text-sm font-mono break-all">
                     {this.state.error.toString()}

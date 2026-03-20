@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Plus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from "@/lib/utils";
+import { nativeHaptics } from '@/lib/native';
 
 /**
  * Floating Action Button for quick actions
@@ -14,9 +15,7 @@ export default function FloatingActionButton({ onClick, className }) {
   const handleClick = () => {
     // Only trigger onClick if not dragging
     if (!isDragging) {
-      if (navigator.vibrate) {
-        navigator.vibrate(10);
-      }
+      nativeHaptics.tap();
       onClick();
     }
   };

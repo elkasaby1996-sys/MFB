@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import { BASE44_APP_URL, logBase44Debug, logBase44Error } from '@/lib/base44-config';
 
 const AuthContext = createContext();
 
@@ -21,11 +22,12 @@ export const AuthProvider = ({ children }) => {
     try {
       setIsLoadingPublicSettings(true);
       setAuthError(null);
+      const resolvedServerUrl = appParams.serverUrl || BASE44_APP_URL;
       
       // First, check app public settings (with token if available)
       // This will tell us if auth is required, user not registered, etc.
       const appClient = createAxiosClient({
-        baseURL: `${appParams.serverUrl}/api/apps/public`,
+        baseURL: `${resolvedServerUrl}/api/apps/public`,
         headers: {
           'X-App-Id': appParams.appId
         },
@@ -34,6 +36,11 @@ export const AuthProvider = ({ children }) => {
       });
       
       try {
+        logBase44Debug('Checking Base44 public settings', {
+          baseURL: `${resolvedServerUrl}/api/apps/public`,
+          appId: appParams.appId,
+          hasToken: Boolean(appParams.token),
+        });
         const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
         setAppPublicSettings(publicSettings);
         
@@ -41,12 +48,20 @@ export const AuthProvider = ({ children }) => {
         if (appParams.token) {
           await checkUserAuth();
         } else {
+          setAuthError({
+            type: 'auth_required',
+            message: 'Authentication required'
+          });
           setIsLoadingAuth(false);
           setIsAuthenticated(false);
         }
         setIsLoadingPublicSettings(false);
       } catch (appError) {
-        console.error('App state check failed:', appError);
+        logBase44Error('App state check failed', appError, {
+          appId: appParams.appId,
+          serverUrl: resolvedServerUrl,
+          hasToken: Boolean(appParams.token),
+        });
         
         // Handle app-level errors
         if (appError.status === 403 && appError.data?.extra_data?.reason) {
@@ -77,7 +92,10 @@ export const AuthProvider = ({ children }) => {
         setIsLoadingAuth(false);
       }
     } catch (error) {
-      console.error('Unexpected error:', error);
+      logBase44Error('Unexpected auth bootstrap error', error, {
+        appId: appParams.appId,
+        serverUrl: appParams.serverUrl || BASE44_APP_URL,
+      });
       setAuthError({
         type: 'unknown',
         message: error.message || 'An unexpected error occurred'
@@ -91,12 +109,19 @@ export const AuthProvider = ({ children }) => {
     try {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
+      logBase44Debug('Checking current Base44 user auth', {
+        serverUrl: appParams.serverUrl || BASE44_APP_URL,
+        hasToken: Boolean(appParams.token),
+      });
       const currentUser = await base44.auth.me();
       setUser(currentUser);
       setIsAuthenticated(true);
       setIsLoadingAuth(false);
     } catch (error) {
-      console.error('User auth check failed:', error);
+      logBase44Error('User auth check failed', error, {
+        serverUrl: appParams.serverUrl || BASE44_APP_URL,
+        hasToken: Boolean(appParams.token),
+      });
       setIsLoadingAuth(false);
       setIsAuthenticated(false);
       

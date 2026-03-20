@@ -11,7 +11,7 @@ export default function About() {
   const appInfo = {
     version: '1.0.0',
     build: '100',
-    environment: process.env.NODE_ENV || 'production',
+    environment: import.meta.env.MODE || 'production',
   };
 
   return (
