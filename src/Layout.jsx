@@ -43,9 +43,6 @@ function useIOSPWASetup() {
     // Prevent bounce/overscroll on iOS
     document.body.style.overscrollBehavior = 'none';
     document.documentElement.style.overscrollBehavior = 'none';
-    if (isNativePlatform()) {
-      document.body.classList.add('native-app');
-    }
   }, []);
 }
 
@@ -60,12 +57,6 @@ export default function Layout({ children, currentPageName }) {
     queryFn: () => base44.entities.UserProfile.list(),
   });
   const profile = profiles?.[0];
-
-  // Hide FAB during onboarding and upgrade screen
-  const showFAB = currentPageName !== 'Onboarding' 
-    && currentPageName !== 'Paywall'
-    && currentPageName !== 'AIAssistant'
-    && profile?.onboarding_completed;
 
   // Listen for quickAddClick event from BottomNav
   useEffect(() => {

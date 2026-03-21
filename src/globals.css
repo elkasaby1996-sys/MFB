@@ -290,17 +290,13 @@ body {
     font-size: 16px !important; /* Prevent zoom on focus */
   }
   
-  /* Ensure modals and sheets work with iOS keyboard */
-  .sheet-content {
-    max-height: 100dvh;
-  }
 }
 
-.native-shell body {
+html.native-shell body {
   background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
 }
 
-.platform-ios body {
+body.platform-ios {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
