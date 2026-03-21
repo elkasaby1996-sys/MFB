@@ -15,7 +15,7 @@ export default function SubPageHeader({ title, rightContent, className }) {
   return (
     <div
       className={cn(
-        'flex items-center gap-2 pt-safe px-4 py-3 sticky top-0 z-[60]',
+        'flex items-center gap-2 pt-safe px-4 py-3 sticky top-0 z-[60] safe-x',
         'bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50',
         className
       )}

@@ -350,11 +350,11 @@ USER QUESTION: ${messageText}`;
   };
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col bg-slate-950">
+    <div className="app-screen overflow-hidden flex flex-col bg-slate-950">
       <SubPageHeader title="AI Bro" />
       {/* Scrollable Messages Area - with padding for input bar + bottom nav */}
-      <main className="flex-1 overflow-y-auto bg-slate-950" style={{ paddingBottom: 'calc(180px + env(safe-area-inset-bottom, 0px))' }}>
-        <div className="px-4">
+      <main className="flex-1 overflow-y-auto bg-slate-950" style={{ paddingBottom: 'calc(180px + var(--safe-bottom))' }}>
+        <div className="px-4 safe-x">
           <div className="max-w-lg mx-auto space-y-3 py-3">
           
           {/* Header */}
@@ -542,7 +542,7 @@ USER QUESTION: ${messageText}`;
       </main>
       
       {/* Fixed Input Bar */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-slate-800/50 bg-slate-900/95 backdrop-blur-xl z-40" style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+      <div className="fixed bottom-0 left-0 right-0 border-t border-slate-800/50 bg-slate-900/95 backdrop-blur-xl z-40 safe-bottom safe-x keyboard-docked transition-[bottom] duration-200" style={{ paddingBottom: 'var(--safe-bottom)' }}>
         <div className="max-w-lg mx-auto px-4 sm:px-6">
           {!canSendMessage ? (
             <div className="py-4 text-center">
@@ -670,7 +670,7 @@ USER QUESTION: ${messageText}`;
           {showDisclaimer && (
             <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60" onClick={() => setShowDisclaimer(false)}>
               <div
-                className="bg-slate-900 border border-slate-700 rounded-t-2xl w-full max-w-lg p-6 pb-10"
+                className="bg-slate-900 border border-slate-700 rounded-t-2xl w-full max-w-lg p-6 pb-[calc(2.5rem+var(--safe-bottom))] safe-x"
                 onClick={e => e.stopPropagation()}
               >
                 <div className="w-10 h-1 bg-slate-600 rounded-full mx-auto mb-5" />

@@ -1,7 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
-import { Check, ChevronDown, Search } from 'lucide-react';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Check, ChevronDown, Search, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { nativeHaptics } from '@/lib/native';
 
 /**
  * MobileSelect – a bottom-sheet picker optimised for iOS / Android.
@@ -43,12 +44,16 @@ export default function MobileSelect({
   }, [options, search, searchable]);
 
   const handleSelect = (optionValue) => {
+    nativeHaptics.selection();
     onValueChange(optionValue);
     setOpen(false);
     setSearch('');
   };
 
   const handleOpenChange = (isOpen) => {
+    if (!isOpen && open) {
+      nativeHaptics.tap();
+    }
     setOpen(isOpen);
     if (!isOpen) setSearch('');
   };
@@ -57,7 +62,11 @@ export default function MobileSelect({
     <>
       <button
         type="button"
-        onClick={() => !disabled && setOpen(true)}
+        onClick={() => {
+          if (disabled) return;
+          nativeHaptics.tap();
+          setOpen(true);
+        }}
         disabled={disabled}
         className={cn(
           'flex items-center justify-between w-full px-4 h-14 rounded-lg border bg-slate-800 border-slate-700 text-white transition-all active:opacity-70 active:scale-[0.99]',
@@ -79,24 +88,27 @@ export default function MobileSelect({
         <ChevronDown className="w-4 h-4 text-slate-400 flex-shrink-0 ml-2" />
       </button>
 
-      <Sheet open={open} onOpenChange={handleOpenChange}>
-        <SheetContent
-          side="bottom"
-          hideClose
+      <Drawer open={open} onOpenChange={handleOpenChange}>
+        <DrawerContent
           className="bg-slate-950 border-slate-800 rounded-t-3xl flex flex-col"
           style={{ paddingBottom: 0, maxHeight: '85dvh' }}
         >
-          {/* Drag handle */}
-          <div className="flex justify-center pt-3 pb-2 flex-shrink-0">
-            <div className="w-10 h-1 bg-slate-700 rounded-full" />
+          <div className="flex items-center justify-between px-5 pb-3 pt-2 flex-shrink-0">
+            <div className="min-w-[44px]" />
+            {title ? (
+              <h3 className="text-white text-lg font-semibold text-center">{title}</h3>
+            ) : (
+              <div />
+            )}
+            <button
+              type="button"
+              onClick={() => handleOpenChange(false)}
+              aria-label="Close"
+              className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-slate-400 active:bg-slate-800 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
           </div>
-
-          {/* Title */}
-          {title && (
-            <div className="px-5 pb-3 flex-shrink-0">
-              <h3 className="text-white text-lg font-semibold">{title}</h3>
-            </div>
-          )}
 
           {/* Search bar */}
           {searchable && (
@@ -159,8 +171,8 @@ export default function MobileSelect({
               ))
             )}
           </div>
-        </SheetContent>
-      </Sheet>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }
