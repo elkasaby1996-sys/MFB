@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
 import './globals.css';
 import { LanguageProvider } from '@/components/i18n/LanguageProvider';
 import { PremiumProvider } from '@/components/providers/PremiumProvider';
@@ -9,7 +8,6 @@ import { ErrorBoundary } from '@/components/providers/ErrorBoundary';
 import { NetworkStatusProvider } from '@/components/providers/NetworkStatusProvider';
 import { NavigationProvider } from '@/components/providers/NavigationProvider';
 import OfflineBanner from '@/components/providers/OfflineBanner';
-import FloatingActionButton from '@/components/ui/FloatingActionButton';
 import QuickAddSheet from '@/components/ui/QuickAddSheet';
 import AddTransactionModal from '@/components/dashboard/AddTransactionModal';
 import { useQuery } from '@tanstack/react-query';
@@ -82,17 +80,19 @@ export default function Layout({ children, currentPageName }) {
             <NavigationProvider>
               <LanguageProvider>
                 <OfflineBanner />
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentPageName}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                  >
-                    {children}
-                  </motion.div>
-                </AnimatePresence>
+                <div className="app-shell">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentPageName}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                    >
+                      {children}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
                 {/* FAB moved to BottomNav */}
                 <QuickAddSheet 
                   isOpen={showQuickAdd} 
