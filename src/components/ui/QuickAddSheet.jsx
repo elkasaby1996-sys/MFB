@@ -32,9 +32,9 @@ export default function QuickAddSheet({ isOpen, onClose, onSelectType }) {
             animate={{ y: 0 }}
             exit={{ y: '100%' }}
             transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 rounded-t-3xl shadow-2xl"
+            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 rounded-t-3xl shadow-2xl safe-bottom safe-x"
             style={{
-              paddingBottom: 'env(safe-area-inset-bottom)'
+              paddingBottom: 'var(--safe-bottom)'
             }}
           >
             {/* Handle */}

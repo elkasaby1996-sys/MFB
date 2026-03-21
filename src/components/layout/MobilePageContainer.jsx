@@ -22,7 +22,7 @@ export default function MobilePageContainer({
     <div className={cn(
       "w-full mx-auto px-4 sm:px-6",
       maxWidthClass,
-      withBottomNav ? "pb-24" : "pb-8",
+      withBottomNav ? "pb-[calc(6rem+var(--safe-bottom))]" : "pb-[calc(2rem+var(--safe-bottom))]",
       className
     )}>
       {children}
