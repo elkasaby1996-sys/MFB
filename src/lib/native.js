@@ -106,11 +106,8 @@ export async function setupNativeShell() {
 
   if (statusBar) {
     try {
-      await statusBar.setOverlaysWebView?.({ overlay: false });
-      await statusBar.setStyle?.({
-        style: window.matchMedia('(prefers-color-scheme: dark)').matches ? 'DARK' : 'LIGHT',
-      });
-      await statusBar.setBackgroundColor?.({ color: '#020617' });
+      await applyStatusBarState();
+      attachStatusBarListeners();
     } catch {}
   }
 
@@ -133,11 +130,9 @@ export async function setupNativeShell() {
 export async function syncStatusBarStyle(isDarkMode) {
   if (!isNativePlatform()) return;
 
-  if (statusBar?.setStyle) {
+  if (statusBar) {
     try {
-      await statusBar.setStyle({
-        style: isDarkMode ? 'DARK' : 'LIGHT',
-      });
+      await applyStatusBarState(isDarkMode);
     } catch {}
   }
 }
