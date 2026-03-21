@@ -16,6 +16,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { CURRENCIES } from '@/components/constants/currencies';
 import { COUNTRIES } from '@/components/constants/countries';
 import { toast } from 'sonner';
+import { nativeHaptics } from '@/lib/native';
 
 
 const GOALS = [
@@ -139,6 +140,7 @@ export default function Onboarding() {
       }
       
       // Show upgrade screen (do NOT set onboarding_completed yet)
+      nativeHaptics.notifySuccess();
       setStep(5);
     } catch (error) {
       console.error("Error saving profile:", {
@@ -170,6 +172,7 @@ export default function Onboarding() {
       }
       // Mark onboarding as completed in localStorage
       await OnboardingService.setCompleted(true);
+      nativeHaptics.notifySuccess();
       navigate(createPageUrl("Dashboard"));
     } catch (error) {
       console.error("Error updating tier:", {
@@ -521,6 +524,7 @@ export default function Onboarding() {
                      <div className="space-y-3 pt-2">
                        <NeonButton
                          variant="purple"
+                         haptic="confirm"
                          className="w-full"
                          onClick={() => {
                            window.webkit?.messageHandlers?.iap?.postMessage({
@@ -536,6 +540,7 @@ export default function Onboarding() {
                        </NeonButton>
                        <NeonButton
                          variant="primary"
+                         haptic="confirm"
                          className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 shadow-[0_0_20px_rgba(59,130,246,0.3)]"
                          onClick={() => {
                            window.webkit?.messageHandlers?.iap?.postMessage({
@@ -551,6 +556,7 @@ export default function Onboarding() {
                        </NeonButton>
                        <NeonButton
                          variant="ghost"
+                         haptic="tap"
                          className="w-full text-slate-400"
                          onClick={() => {
                            window.webkit?.messageHandlers?.iap?.postMessage({ action: 'restore' });
@@ -563,6 +569,7 @@ export default function Onboarding() {
                        </NeonButton>
                        <NeonButton
                          variant="ghost"
+                         haptic="confirm"
                          className="w-full"
                          onClick={() => handleUpgradeTier('free')}
                        >
@@ -592,6 +599,7 @@ export default function Onboarding() {
             {step > 1 && (
               <NeonButton
                 variant="secondary"
+                haptic="selection"
                 onClick={() => setStep(s => s - 1)}
                 className="flex-1"
               >
@@ -602,6 +610,7 @@ export default function Onboarding() {
             
             {step < 4 ? (
               <NeonButton
+                haptic="confirm"
                 onClick={() => setStep(s => s + 1)}
                 disabled={!canProceed()}
                 className="flex-1"
@@ -611,6 +620,7 @@ export default function Onboarding() {
               </NeonButton>
             ) : step === 4 ? (
               <NeonButton
+                haptic="confirm"
                 onClick={handleSubmit}
                 loading={loading}
                 disabled={!canProceed()}
