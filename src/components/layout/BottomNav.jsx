@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { cn } from "@/lib/utils";
 import { useNavigation } from '@/components/providers/NavigationProvider';
 import { 
   Home, 
@@ -10,7 +9,6 @@ import {
   MoreHorizontal,
   Plus
 } from "lucide-react";
-import { motion } from 'framer-motion';
 import { nativeHaptics } from '@/lib/native';
 
 const NAV_ITEMS = [
