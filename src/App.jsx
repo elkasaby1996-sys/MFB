@@ -41,8 +41,43 @@ const LayoutWrapper = ({ children, currentPageName }) => Layout ?
   <Layout currentPageName={currentPageName}>{children}</Layout>
   : <>{children}</>;
 
+const StartupFallback = ({ message, onRetry }) => (
+  <div className="fixed inset-0 flex items-center justify-center bg-slate-950 px-6">
+    <div className="max-w-sm text-center space-y-4">
+      <div className="mx-auto h-12 w-12 rounded-full border border-slate-700 bg-slate-900/70 flex items-center justify-center text-cyan-400 text-2xl">
+        ⚠️
+      </div>
+      <div className="space-y-2">
+        <h2 className="text-white text-lg font-semibold">Unable to finish startup</h2>
+        <p className="text-slate-400 text-sm">{message || 'Please try again.'}</p>
+      </div>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="w-full min-h-[44px] rounded-xl bg-cyan-500 text-slate-950 font-semibold active:scale-[0.98] transition-transform"
+      >
+        Try Again
+      </button>
+    </div>
+  </div>
+);
+
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin, checkAppState } = useAuth();
+  const [loginRequested, setLoginRequested] = React.useState(false);
+
+  React.useEffect(() => {
+    if (authError?.type === 'auth_required' && !loginRequested) {
+      setLoginRequested(true);
+      navigateToLogin();
+    }
+  }, [authError, loginRequested, navigateToLogin]);
+
+  React.useEffect(() => {
+    if (authError?.type !== 'auth_required') {
+      setLoginRequested(false);
+    }
+  }, [authError]);
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
@@ -62,10 +97,10 @@ const AuthenticatedApp = () => {
         </LayoutWrapper>
       );
     } else if (authError.type === 'auth_required') {
-      // Redirect to login automatically
-      navigateToLogin();
       return null;
     }
+
+    return <StartupFallback message={authError.message} onRetry={checkAppState} />;
   }
 
   // Render the main app

@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useCallback, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
-import { cn } from "@/lib/utils";
 import { useNavigation } from '@/components/providers/NavigationProvider';
 import { 
   Home, 
@@ -10,7 +9,6 @@ import {
   MoreHorizontal,
   Plus
 } from "lucide-react";
-import { motion } from 'framer-motion';
 import { nativeHaptics } from '@/lib/native';
 
 const NAV_ITEMS = [
@@ -156,7 +154,7 @@ export default function BottomNav({ currentPage }) {
   // ── Tab click ──────────────────────────────────────────────────────────────
   const handleTabClick = useCallback((e, item) => {
     e.preventDefault();
-    nativeHaptics.tap();
+    nativeHaptics.selection();
     // Expand nav immediately on tap
     setCompactSafe(false);
     const currentPageTab = getTabForPage(location.pathname);
@@ -183,8 +181,8 @@ export default function BottomNav({ currentPage }) {
     <nav
       role="navigation"
       aria-label="Main navigation"
-      className="fixed left-0 right-0 z-50"
-      style={{ bottom: 'max(16px, calc(env(safe-area-inset-bottom) + 8px))' }}
+      className="fixed left-0 right-0 z-50 px-safe transition-all duration-200 keyboard-hidden"
+      style={{ bottom: 'max(16px, calc(var(--safe-bottom) + 8px))' }}
     >
       <div
         style={{
@@ -214,8 +212,8 @@ export default function BottomNav({ currentPage }) {
                 onClick={(e) => handleTabClick(e, item)}
                 className="flex items-center justify-center rounded-2xl cursor-pointer active:scale-90 active:opacity-60"
                 style={{
-                  minWidth: '40px',
-                  minHeight: '40px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   paddingLeft: '4px',
                   paddingRight: '4px',
                 }}
@@ -249,7 +247,7 @@ export default function BottomNav({ currentPage }) {
 
           <button
             onClick={() => {
-              nativeHaptics.tap();
+              nativeHaptics.confirm();
               const event = new CustomEvent('quickAddClick');
               window.dispatchEvent(event);
             }}
