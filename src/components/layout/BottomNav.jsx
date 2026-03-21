@@ -154,7 +154,7 @@ export default function BottomNav({ currentPage }) {
   // ── Tab click ──────────────────────────────────────────────────────────────
   const handleTabClick = useCallback((e, item) => {
     e.preventDefault();
-    nativeHaptics.tap();
+    nativeHaptics.selection();
     // Expand nav immediately on tap
     setCompactSafe(false);
     const currentPageTab = getTabForPage(location.pathname);
@@ -212,8 +212,8 @@ export default function BottomNav({ currentPage }) {
                 onClick={(e) => handleTabClick(e, item)}
                 className="flex items-center justify-center rounded-2xl cursor-pointer active:scale-90 active:opacity-60"
                 style={{
-                  minWidth: '40px',
-                  minHeight: '40px',
+                  minWidth: '44px',
+                  minHeight: '44px',
                   paddingLeft: '4px',
                   paddingRight: '4px',
                 }}
@@ -247,7 +247,7 @@ export default function BottomNav({ currentPage }) {
 
           <button
             onClick={() => {
-              nativeHaptics.tap();
+              nativeHaptics.confirm();
               const event = new CustomEvent('quickAddClick');
               window.dispatchEvent(event);
             }}

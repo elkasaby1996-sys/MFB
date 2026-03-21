@@ -6,7 +6,49 @@ const plugins = Capacitor?.Plugins ?? {};
 const statusBar = plugins.StatusBar;
 const keyboard = globalThis?.Capacitor?.Plugins?.Keyboard ?? plugins.Keyboard;
 const splashScreen = plugins.SplashScreen;
-const haptics = plugins.Haptics;
+const haptics = globalThis?.Capacitor?.Plugins?.Haptics ?? plugins.Haptics;
+
+let keyboardListenersAttached = false;
+
+const getSafeBottomInset = () => {
+  if (typeof window === 'undefined') return 0;
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom');
+  return Number.parseFloat(raw) || 0;
+};
+
+export function setKeyboardInset(height = 0, isOpen = false) {
+  if (typeof document === 'undefined') return;
+
+  const normalizedHeight = Math.max(0, Math.round(height));
+  const keyboardOffset = Math.max(0, normalizedHeight - getSafeBottomInset());
+
+  document.documentElement.style.setProperty('--keyboard-height', `${normalizedHeight}px`);
+  document.documentElement.style.setProperty('--keyboard-offset', `${keyboardOffset}px`);
+  document.body.classList.toggle('keyboard-open', isOpen && normalizedHeight > 0);
+}
+
+export function resetKeyboardInset() {
+  setKeyboardInset(0, false);
+}
+
+function attachKeyboardListeners() {
+  if (!keyboard || keyboardListenersAttached || !isNativePlatform() || !isIOS()) return;
+
+  keyboardListenersAttached = true;
+
+  keyboard.addListener?.('keyboardWillShow', ({ keyboardHeight }) => {
+    setKeyboardInset(keyboardHeight, true);
+  });
+  keyboard.addListener?.('keyboardDidShow', ({ keyboardHeight }) => {
+    setKeyboardInset(keyboardHeight, true);
+  });
+  keyboard.addListener?.('keyboardWillHide', () => {
+    resetKeyboardInset();
+  });
+  keyboard.addListener?.('keyboardDidHide', () => {
+    resetKeyboardInset();
+  });
+}
 
 let keyboardListenersAttached = false;
 
@@ -111,10 +153,40 @@ async function impact(style = 'LIGHT') {
   } catch {}
 }
 
+async function selection() {
+  try {
+    if (isNativePlatform() && haptics?.selectionStart) {
+      await haptics.selectionStart();
+      await haptics.selectionChanged?.();
+      await haptics.selectionEnd?.();
+      return;
+    }
+
+    await impact('LIGHT');
+  } catch {}
+}
+
+async function notify(type = 'SUCCESS') {
+  try {
+    if (isNativePlatform() && haptics?.notification) {
+      await haptics.notification({ type });
+      return;
+    }
+
+    const fallback = type === 'SUCCESS' ? 'MEDIUM' : 'HEAVY';
+    await impact(fallback);
+  } catch {}
+}
+
 export const nativeHaptics = {
   tap: () => impact('LIGHT'),
+  selection,
   success: () => impact('MEDIUM'),
   heavy: () => impact('HEAVY'),
+  confirm: () => impact('MEDIUM'),
+  warning: () => notify('WARNING'),
+  error: () => notify('ERROR'),
+  notifySuccess: () => notify('SUCCESS'),
 };
 
 export { isIOS, isNativePlatform };
