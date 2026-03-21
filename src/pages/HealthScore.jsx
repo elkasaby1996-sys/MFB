@@ -7,11 +7,11 @@ import { cn } from "@/lib/utils";
 import SpaceBackground from '@/components/layout/SpaceBackground';
 import BottomNav from '@/components/layout/BottomNav';
 import NeonCard from '@/components/ui/NeonCard';
-import NeonButton from '@/components/ui/NeonButton';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import NeonProgress from '@/components/ui/NeonProgress';
-import { ArrowLeft, TrendingUp, Sparkles } from 'lucide-react';
+import { ArrowLeft, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { calculateFinancialHealthScore, getScoreLabel, getImprovementSuggestions } from '@/components/health/calculateHealthScore';
+import { calculateFinancialHealthScore, getImprovementSuggestions } from '@/components/health/calculateHealthScore';
 import { usePremium } from '@/components/providers/PremiumProvider';
 import PaywallGate from '@/components/subscription/PaywallGate';
 import { calculateDataPresence, getHealthScoreLabel } from '@/components/utils/dataPresence';
@@ -348,24 +348,17 @@ export default function HealthScore() {
               <h3 className="text-white font-semibold mb-3 text-base">Your Money Lifestyle</h3>
               
               {/* Time Range Toggle */}
-              <div className="flex items-center gap-2 mb-4">
-                <NeonButton
-                  variant={timeRange === 90 ? 'primary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setTimeRange(90)}
-                  className="flex-1"
-                >
-                  Last 3 Months
-                </NeonButton>
-                <NeonButton
-                  variant={timeRange === 180 ? 'primary' : 'ghost'}
-                  size="sm"
-                  onClick={() => setTimeRange(180)}
-                  className="flex-1"
-                >
-                  Last 6 Months
-                </NeonButton>
-              </div>
+              <SegmentedControl
+                value={String(timeRange)}
+                onValueChange={(nextValue) => setTimeRange(Number(nextValue))}
+                fullWidth
+                ariaLabel="Lifestyle time range"
+                className="mb-4"
+                options={[
+                  { value: '90', label: 'Last 3 Months' },
+                  { value: '180', label: 'Last 6 Months' },
+                ]}
+              />
 
               {/* Top Personas */}
               {topLifestyleTags.length > 0 && (

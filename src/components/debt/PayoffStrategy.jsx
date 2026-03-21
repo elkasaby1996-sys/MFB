@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { formatMoney } from '@/components/utils/formatMoney';
 import NeonCard from '@/components/ui/NeonCard';
 import { Zap, Target, TrendingDown } from "lucide-react";
+import SegmentedControl from '@/components/ui/SegmentedControl';
 
 export default function PayoffStrategy({ debts, currency = 'USD' }) {
   const [selectedStrategy, setSelectedStrategy] = useState('avalanche');
@@ -89,31 +90,18 @@ export default function PayoffStrategy({ debts, currency = 'USD' }) {
       </div>
 
       {/* Strategy Toggle */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        {Object.entries(strategies).map(([key, strategy]) => {
-          const StratIcon = strategy.icon;
-          return (
-            <button
-              key={key}
-              onClick={() => setSelectedStrategy(key)}
-              className={`p-3 rounded-xl border-2 transition-all ${
-                selectedStrategy === key
-                  ? `border-${strategy.color}-500 bg-${strategy.color}-500/20`
-                  : 'border-slate-700 bg-slate-800/50 hover:bg-slate-700/50'
-              }`}
-            >
-              <StratIcon className={`w-5 h-5 mb-1 mx-auto ${
-                selectedStrategy === key ? `text-${strategy.color}-400` : 'text-slate-400'
-              }`} />
-              <p className={`text-xs font-medium ${
-                selectedStrategy === key ? 'text-white' : 'text-slate-400'
-              }`}>
-                {strategy.name.replace(' Method', '')}
-              </p>
-            </button>
-          );
-        })}
-      </div>
+      <SegmentedControl
+        value={selectedStrategy}
+        onValueChange={setSelectedStrategy}
+        fullWidth
+        ariaLabel="Debt payoff strategy"
+        className="mb-4"
+        options={Object.entries(strategies).map(([key, strategy]) => ({
+          value: key,
+          label: strategy.name.replace(' Method', ''),
+          icon: strategy.icon,
+        }))}
+      />
 
       {/* Strategy Info */}
       <div className="bg-slate-800/30 rounded-xl p-4 mb-4">
