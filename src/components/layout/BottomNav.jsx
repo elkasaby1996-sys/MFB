@@ -181,7 +181,7 @@ export default function BottomNav({ currentPage }) {
     <nav
       role="navigation"
       aria-label="Main navigation"
-      className="fixed left-0 right-0 z-50 px-safe transition-all duration-200 keyboard-hidden"
+      className="fixed left-0 right-0 z-50 px-safe"
       style={{ bottom: 'max(16px, calc(var(--safe-bottom) + 8px))' }}
     >
       <div

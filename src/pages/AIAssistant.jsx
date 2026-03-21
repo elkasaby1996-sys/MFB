@@ -542,7 +542,7 @@ USER QUESTION: ${messageText}`;
       </main>
       
       {/* Fixed Input Bar */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-slate-800/50 bg-slate-900/95 backdrop-blur-xl z-40 safe-bottom safe-x keyboard-docked transition-[bottom] duration-200" style={{ paddingBottom: 'var(--safe-bottom)' }}>
+      <div className="fixed bottom-0 left-0 right-0 border-t border-slate-800/50 bg-slate-900/95 backdrop-blur-xl z-40 safe-bottom safe-x" style={{ paddingBottom: 'var(--safe-bottom)' }}>
         <div className="max-w-lg mx-auto px-4 sm:px-6">
           {!canSendMessage ? (
             <div className="py-4 text-center">
