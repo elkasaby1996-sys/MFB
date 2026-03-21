@@ -268,11 +268,6 @@ body,
   min-height: 100dvh;
 }
 
-.app-shell {
-  min-height: 100dvh;
-  background: hsl(var(--background));
-}
-
 body {
   padding: 0;
 }
