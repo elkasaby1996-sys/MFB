@@ -80,9 +80,8 @@ export default function ScreenScrollContainer({ children, className }) {
     <div 
       ref={scrollRef}
       className={cn(
-        "bg-slate-950 overflow-y-auto relative",
-        "pt-[env(safe-area-inset-top)]",
-        "pb-[calc(80px+env(safe-area-inset-bottom))]",
+        "bg-slate-950 overflow-y-auto relative app-screen safe-top safe-x",
+        "pb-[calc(80px+var(--safe-bottom))]",
         className
       )}
       onTouchStart={handleTouchStart}
@@ -102,7 +101,7 @@ export default function ScreenScrollContainer({ children, className }) {
           className="absolute top-0 left-0 right-0 flex justify-center z-50"
           style={{ 
             opacity,
-            paddingTop: 'env(safe-area-inset-top)'
+            paddingTop: 'var(--safe-top)'
           }}
         >
           <div className="bg-slate-900/95 backdrop-blur-sm rounded-full px-4 py-2 shadow-lg flex items-center gap-2 mt-4">

@@ -183,8 +183,8 @@ export default function BottomNav({ currentPage }) {
     <nav
       role="navigation"
       aria-label="Main navigation"
-      className="fixed left-0 right-0 z-50"
-      style={{ bottom: 'max(16px, calc(env(safe-area-inset-bottom) + 8px))' }}
+      className="fixed left-0 right-0 z-50 px-safe"
+      style={{ bottom: 'max(16px, calc(var(--safe-bottom) + 8px))' }}
     >
       <div
         style={{
