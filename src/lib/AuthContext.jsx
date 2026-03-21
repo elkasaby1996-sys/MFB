@@ -5,6 +5,15 @@ import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
 import { BASE44_APP_URL, logBase44Debug, logBase44Error } from '@/lib/base44-config';
 
 const AuthContext = createContext();
+const BOOTSTRAP_TIMEOUT_MS = 15000;
+
+const withTimeout = (promise, message, timeoutMs = BOOTSTRAP_TIMEOUT_MS) =>
+  Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error(message)), timeoutMs);
+    }),
+  ]);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -41,7 +50,10 @@ export const AuthProvider = ({ children }) => {
           appId: appParams.appId,
           hasToken: Boolean(appParams.token),
         });
-        const publicSettings = await appClient.get(`/prod/public-settings/by-id/${appParams.appId}`);
+        const publicSettings = await withTimeout(
+          appClient.get(`/prod/public-settings/by-id/${appParams.appId}`),
+          'Loading app settings timed out'
+        );
         setAppPublicSettings(publicSettings);
         
         // If we got the app public settings successfully, check if user is authenticated
@@ -109,20 +121,22 @@ export const AuthProvider = ({ children }) => {
     try {
       // Now check if the user is authenticated
       setIsLoadingAuth(true);
+      setAuthError(null);
       logBase44Debug('Checking current Base44 user auth', {
         serverUrl: appParams.serverUrl || BASE44_APP_URL,
         hasToken: Boolean(appParams.token),
       });
-      const currentUser = await base44.auth.me();
+      const currentUser = await withTimeout(
+        base44.auth.me(),
+        'Restoring your session timed out'
+      );
       setUser(currentUser);
       setIsAuthenticated(true);
-      setIsLoadingAuth(false);
     } catch (error) {
       logBase44Error('User auth check failed', error, {
         serverUrl: appParams.serverUrl || BASE44_APP_URL,
         hasToken: Boolean(appParams.token),
       });
-      setIsLoadingAuth(false);
       setIsAuthenticated(false);
       
       // If user auth fails, it might be an expired token
@@ -131,7 +145,14 @@ export const AuthProvider = ({ children }) => {
           type: 'auth_required',
           message: 'Authentication required'
         });
+      } else {
+        setAuthError({
+          type: 'unknown',
+          message: error.message || 'Failed to restore your session'
+        });
       }
+    } finally {
+      setIsLoadingAuth(false);
     }
   };
 

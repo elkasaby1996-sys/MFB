@@ -1,6 +1,7 @@
 import React from 'react';
 import { cn } from "@/lib/utils";
 import { Loader2 } from "lucide-react";
+import { nativeHaptics } from '@/lib/native';
 
 export default function NeonButton({
   children,
@@ -10,6 +11,7 @@ export default function NeonButton({
   loading = false,
   disabled = false,
   onClick,
+  haptic,
   type = "button"
 }) {
   const variants = {
@@ -21,16 +23,15 @@ export default function NeonButton({
   };
 
   const sizes = {
-    sm: "px-4 py-2 text-sm min-h-[40px]",
+    sm: "px-4 py-2 text-sm min-h-[44px]",
     md: "px-6 py-3 text-base min-h-[48px]",
     lg: "px-8 py-4 text-lg min-h-[52px]",
     icon: "p-3 min-h-[44px] min-w-[44px]"
   };
 
   const handleClick = (e) => {
-    // Haptic feedback
-    if (navigator.vibrate && !disabled && !loading) {
-      navigator.vibrate(10);
+    if (!disabled && !loading && haptic && nativeHaptics[haptic]) {
+      nativeHaptics[haptic]();
     }
     onClick?.(e);
   };

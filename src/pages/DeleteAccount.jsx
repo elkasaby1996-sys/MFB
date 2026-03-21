@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { ChevronLeft, AlertTriangle, Trash2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { toast } from 'sonner';
+import { nativeHaptics } from '@/lib/native';
 
 export default function DeleteAccount() {
   const navigate = useNavigate();
@@ -22,6 +23,7 @@ export default function DeleteAccount() {
     }
 
     setDeleting(true);
+    nativeHaptics.heavy();
     try {
       // Call server-side deletion — deletes all data AND the auth identity
       const result = await base44.functions.invoke('deleteUserAccount', {});
@@ -34,12 +36,14 @@ export default function DeleteAccount() {
       localStorage.clear();
 
       setStep(3);
+      nativeHaptics.notifySuccess();
       
       // Sign out and navigate after 3 seconds
       setTimeout(async () => {
         await base44.auth.logout('/');
       }, 3000);
     } catch (error) {
+      nativeHaptics.error();
       toast.error('Failed to delete account. Please contact support@myfinancebro.app');
     } finally {
       setDeleting(false);
@@ -124,6 +128,7 @@ export default function DeleteAccount() {
                 <div className="flex gap-3">
                   <NeonButton
                     variant="secondary"
+                    haptic="selection"
                     onClick={() => navigate(-1)}
                     className="flex-1"
                   >
@@ -131,6 +136,7 @@ export default function DeleteAccount() {
                   </NeonButton>
                   <NeonButton
                     variant="danger"
+                    haptic="warning"
                     onClick={() => setStep(2)}
                     className="flex-1"
                   >
@@ -167,6 +173,7 @@ export default function DeleteAccount() {
                     <div className="flex gap-3">
                       <NeonButton
                         variant="secondary"
+                        haptic="selection"
                         onClick={() => {
                           setStep(1);
                           setConfirmText('');
@@ -177,6 +184,7 @@ export default function DeleteAccount() {
                       </NeonButton>
                       <NeonButton
                         variant="danger"
+                        haptic="warning"
                         onClick={handleDelete}
                         loading={deleting}
                         disabled={confirmText.toLowerCase() !== 'delete my account'}
