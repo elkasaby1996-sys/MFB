@@ -33,8 +33,6 @@
     --safe-right: env(safe-area-inset-right, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-left: env(safe-area-inset-left, 0px);
-    --keyboard-height: 0px;
-    --keyboard-offset: 0px;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -269,26 +267,6 @@ body,
 
 .app-screen {
   min-height: 100dvh;
-}
-
-.app-shell {
-  min-height: 100dvh;
-  background: hsl(var(--background));
-}
-
-.keyboard-docked {
-  bottom: var(--keyboard-offset);
-}
-
-.keyboard-hidden {
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(calc(100% + var(--safe-bottom)));
-}
-
-.keyboard-sheet {
-  bottom: var(--keyboard-offset);
-  max-height: calc(100dvh - var(--keyboard-offset));
 }
 
 body {

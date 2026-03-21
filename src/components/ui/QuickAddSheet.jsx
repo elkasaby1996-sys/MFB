@@ -19,20 +19,33 @@ export default function QuickAddSheet({ isOpen, onClose, onSelectType }) {
   };
 
   return (
-    <Drawer open={isOpen} onOpenChange={(open) => !open && handleClose()}>
-      <DrawerContent className="bg-slate-900 border-slate-800 text-white">
-        <div className="px-6 pb-6">
-          <div className="mb-6 flex items-center justify-between pt-2">
-            <h3 className="text-white text-xl font-semibold">Add Transaction</h3>
-            <button
-              onClick={handleClose}
-              aria-label="Close"
-              className="p-2 rounded-xl text-slate-400 active:bg-slate-800 transition-colors"
-              style={{ minWidth: 44, minHeight: 44 }}
-            >
-              <X className="w-5 h-5" />
-            </button>
-          </div>
+    <AnimatePresence>
+      {isOpen && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+            onClick={onClose}
+          />
+          
+          {/* Sheet */}
+          <motion.div
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 rounded-t-3xl shadow-2xl safe-bottom safe-x"
+            style={{
+              paddingBottom: 'var(--safe-bottom)'
+            }}
+          >
+            {/* Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <div className="w-10 h-1 bg-slate-700 rounded-full" />
+            </div>
 
           <div className="space-y-3">
             <button
