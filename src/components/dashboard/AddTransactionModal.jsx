@@ -13,6 +13,7 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { toast } from 'sonner';
 import { PRIMARY_CATEGORIES, HOME_SUBCATEGORIES, INCOME_CATEGORIES, validateCategoryStructure } from '@/components/utils/categoryConstants';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { nativeHaptics } from '@/lib/native';
 
 export default function AddTransactionModal({ isOpen, onClose, profile, initialType = 'expense' }) {
   const queryClient = useQueryClient();
@@ -68,7 +69,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       queryClient.invalidateQueries({ queryKey: ['savingsGoals'] });
       queryClient.invalidateQueries({ queryKey: ['debts'] });
-      if (navigator.vibrate) navigator.vibrate(10);
+      nativeHaptics.notifySuccess();
       toast.success('Transaction added successfully!');
       handleClose();
     }
@@ -164,6 +165,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
   };
 
   const handleTypeChange = (type) => {
+    nativeHaptics.selection();
     setTransactionType(type);
     setFormData((prev) => ({ ...prev, category: '', subCategory: '', category_icon: '', savings_goal_id: '', debt_id: '' }));
     setCategoryError(false);
@@ -300,7 +302,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
 
           {/* Sticky Footer */}
           <div className="flex-shrink-0 border-t border-slate-800 bg-slate-950 px-5 py-4" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
-            <NeonButton type="submit" loading={createMutation.isPending} disabled={!formData.amount || !formData.category} className="w-full min-h-[52px] text-base font-semibold">
+            <NeonButton type="submit" haptic="confirm" loading={createMutation.isPending} disabled={!formData.amount || !formData.category} className="w-full min-h-[52px] text-base font-semibold">
               Add Transaction
             </NeonButton>
           </div>

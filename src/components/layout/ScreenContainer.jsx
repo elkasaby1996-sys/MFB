@@ -8,9 +8,7 @@ import { cn } from "@/lib/utils";
 export default function ScreenContainer({ children, className }) {
   return (
     <div className={cn(
-      "min-h-screen bg-slate-950",
-      "pt-[env(safe-area-inset-top)]",
-      "pb-[env(safe-area-inset-bottom)]",
+      "app-screen bg-slate-950 safe-top safe-bottom safe-x",
       className
     )}>
       {children}

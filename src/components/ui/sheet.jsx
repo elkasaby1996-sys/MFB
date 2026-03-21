@@ -39,7 +39,7 @@ const sheetVariants = cva(
       side: {
         top: "inset-x-0 top-0 border-b data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top p-6",
         bottom:
-          "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom max-h-[95vh] sm:max-h-[85vh] flex flex-col p-0 overflow-hidden",
+          "inset-x-0 bottom-0 border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom max-h-[95dvh] sm:max-h-[85dvh] flex flex-col p-0 overflow-hidden safe-bottom safe-x keyboard-sheet",
         left: "inset-y-0 left-0 h-full w-3/4 border-r data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left sm:max-w-sm p-6",
         right:
           "inset-y-0 right-0 h-full w-3/4 border-l data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right sm:max-w-sm p-6",
@@ -68,7 +68,7 @@ const SheetContent = React.forwardRef(({ side = "right", className, children, hi
           <SheetPrimitive.Close
             className={cn(
               "absolute rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-secondary",
-              side === "bottom" ? "right-6 top-6 z-10" : "right-4 top-4"
+              side === "bottom" ? "right-[calc(1.5rem+var(--safe-right))] top-6 z-10" : "right-4 top-4"
             )}
           >
             <X className="h-5 w-5" />
@@ -98,7 +98,7 @@ const SheetFooter = ({
   ...props
 }) => (
   <div
-    className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2", className)}
+    className={cn("flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 pb-safe", className)}
     {...props} />
 )
 SheetFooter.displayName = "SheetFooter"

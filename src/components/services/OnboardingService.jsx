@@ -1,3 +1,5 @@
+import { nativePreferences } from '@/lib/nativePreferences';
+
 const ONBOARDING_KEY = 'myfinancebro_onboarding_completed';
 
 export const OnboardingService = {
@@ -7,7 +9,7 @@ export const OnboardingService = {
    */
   async getCompleted() {
     try {
-      const value = localStorage.getItem(ONBOARDING_KEY);
+      const value = await nativePreferences.get(ONBOARDING_KEY);
       return value === 'true';
     } catch (error) {
       console.error('Error reading onboarding status:', error);
@@ -22,7 +24,7 @@ export const OnboardingService = {
    */
   async setCompleted(value) {
     try {
-      localStorage.setItem(ONBOARDING_KEY, value.toString());
+      await nativePreferences.set(ONBOARDING_KEY, value.toString());
     } catch (error) {
       console.error('Error setting onboarding status:', error);
     }
@@ -34,7 +36,7 @@ export const OnboardingService = {
    */
   async reset() {
     try {
-      localStorage.removeItem(ONBOARDING_KEY);
+      await nativePreferences.remove(ONBOARDING_KEY);
     } catch (error) {
       console.error('Error resetting onboarding:', error);
     }

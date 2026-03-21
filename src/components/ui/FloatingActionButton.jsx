@@ -56,7 +56,7 @@ export default function FloatingActionButton({ onClick, className }) {
         className
       )}
       style={{
-        bottom: `calc(100px + env(safe-area-inset-bottom))`
+        bottom: `calc(100px + var(--safe-bottom))`
       }}
     >
       <Plus className="w-7 h-7 text-white" strokeWidth={3} />
