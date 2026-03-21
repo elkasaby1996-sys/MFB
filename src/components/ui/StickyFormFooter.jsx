@@ -20,7 +20,7 @@ export default function StickyFormFooter({
     <div className={cn(
       "sticky bottom-0 left-0 right-0 z-10",
       "bg-slate-900/95 backdrop-blur-xl border-t border-slate-800",
-      "p-4 pb-safe",
+      "p-4 pb-safe safe-x",
       className
     )}>
       <div className="flex gap-3 max-w-lg mx-auto">
