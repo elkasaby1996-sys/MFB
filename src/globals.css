@@ -93,12 +93,13 @@
   }
 
   /* Fix text colors in all form inputs */
-  input,
-  textarea,
-  select {
-    color: var(--text-primary) !important;
-    caret-color: var(--text-primary) !important;
-  }
+input,
+textarea,
+select {
+  color: var(--text-primary) !important;
+  caret-color: var(--text-primary) !important;
+  scroll-margin-bottom: calc(var(--keyboard-offset) + 120px);
+}
 
   /* Allow explicit text-white on inputs to override the global rule */
   input.text-white,

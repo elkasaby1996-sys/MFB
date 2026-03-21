@@ -13,6 +13,7 @@ import AddTransactionModal from '@/components/dashboard/AddTransactionModal';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { isNativePlatform } from '@/lib/native';
+import { useKeyboardAwareLayout } from '@/hooks/useKeyboardAwareLayout';
 
 
 function useIOSPWASetup() {
@@ -50,6 +51,7 @@ function useIOSPWASetup() {
 
 export default function Layout({ children, currentPageName }) {
   useIOSPWASetup();
+  useKeyboardAwareLayout();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [transactionType, setTransactionType] = useState('expense');
