@@ -9,7 +9,6 @@ const splashScreen = plugins.SplashScreen;
 const haptics = globalThis?.Capacitor?.Plugins?.Haptics ?? plugins.Haptics;
 
 let keyboardListenersAttached = false;
-let statusBarListenersAttached = false;
 
 const getSafeBottomInset = () => {
   if (typeof window === 'undefined') return 0;
@@ -51,29 +50,46 @@ function attachKeyboardListeners() {
   });
 }
 
-async function applyStatusBarState(isDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches) {
-  if (!isNativePlatform() || !statusBar) return;
+let keyboardListenersAttached = false;
 
-  await statusBar.show?.();
-  await statusBar.setOverlaysWebView?.({ overlay: false });
-  await statusBar.setStyle?.({
-    style: isDarkMode ? 'DARK' : 'LIGHT',
-  });
-  await statusBar.setBackgroundColor?.({ color: '#020617' });
+const getSafeBottomInset = () => {
+  if (typeof window === 'undefined') return 0;
+  const raw = getComputedStyle(document.documentElement).getPropertyValue('--safe-bottom');
+  return Number.parseFloat(raw) || 0;
+};
+
+export function setKeyboardInset(height = 0, isOpen = false) {
+  if (typeof document === 'undefined') return;
+
+  const normalizedHeight = Math.max(0, Math.round(height));
+  const keyboardOffset = Math.max(0, normalizedHeight - getSafeBottomInset());
+
+  document.documentElement.style.setProperty('--keyboard-height', `${normalizedHeight}px`);
+  document.documentElement.style.setProperty('--keyboard-offset', `${keyboardOffset}px`);
+  document.body.classList.toggle('keyboard-open', isOpen && normalizedHeight > 0);
 }
 
-function attachStatusBarListeners() {
-  if (statusBarListenersAttached || typeof document === 'undefined') return;
+export function resetKeyboardInset() {
+  setKeyboardInset(0, false);
+}
 
-  statusBarListenersAttached = true;
+function attachKeyboardListeners() {
+  if (!keyboard || keyboardListenersAttached || !isNativePlatform() || !isIOS()) return;
 
-  const handleVisibility = () => {
-    if (document.visibilityState === 'visible') {
-      applyStatusBarState().catch(() => {});
-    }
-  };
+  keyboardListenersAttached = true;
 
-  document.addEventListener('visibilitychange', handleVisibility);
+  keyboard.addListener?.('keyboardWillShow', ({ keyboardHeight }) => {
+    setKeyboardInset(keyboardHeight, true);
+  });
+  keyboard.addListener?.('keyboardDidShow', ({ keyboardHeight }) => {
+    setKeyboardInset(keyboardHeight, true);
+  });
+  keyboard.addListener?.('keyboardWillHide', () => {
+    resetKeyboardInset();
+  });
+  keyboard.addListener?.('keyboardDidHide', () => {
+    resetKeyboardInset();
+  });
 }
 
 export async function setupNativeShell() {
