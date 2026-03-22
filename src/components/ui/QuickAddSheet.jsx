@@ -4,7 +4,7 @@ import { nativeHaptics } from '@/lib/native';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
 
 /**
- * Bottom sheet for quick transaction type selection
+ * Bottom sheet for quick transaction type selection.
  */
 export default function QuickAddSheet({ isOpen, onClose, onSelectType }) {
   const handleSelect = (type) => {
@@ -13,73 +13,63 @@ export default function QuickAddSheet({ isOpen, onClose, onSelectType }) {
     onClose();
   };
 
-  const handleClose = () => {
-    nativeHaptics.tap();
-    onClose();
+  const handleOpenChange = (open) => {
+    if (!open) {
+      nativeHaptics.tap();
+      onClose();
+    }
   };
 
   return (
-    <AnimatePresence>
-      {isOpen && (
-        <>
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50"
+    <Drawer open={isOpen} onOpenChange={handleOpenChange}>
+      <DrawerContent className="rounded-t-[28px] border-slate-800 bg-slate-900 px-4 pb-4">
+        <div className="flex items-center justify-between px-1 pb-3 pt-2">
+          <div className="min-w-[44px]" />
+          <h3 className="text-lg font-semibold text-white">Quick add</h3>
+          <button
+            type="button"
             onClick={onClose}
-          />
-          
-          {/* Sheet */}
-          <motion.div
-            initial={{ y: '100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-            className="fixed bottom-0 left-0 right-0 z-50 bg-slate-900 rounded-t-3xl shadow-2xl safe-bottom safe-x"
-            style={{
-              paddingBottom: 'var(--safe-bottom)'
-            }}
+            aria-label="Close"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-xl text-slate-400 transition-colors active:bg-slate-800"
           >
-            {/* Handle */}
-            <div className="flex justify-center pt-3 pb-2">
-              <div className="w-10 h-1 bg-slate-700 rounded-full" />
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <div className="space-y-3 pb-safe">
+          <button
+            type="button"
+            onClick={() => handleSelect('expense')}
+            className="w-full rounded-2xl border-2 border-red-500/30 bg-red-500/10 p-5 text-left transition-all duration-200 active:scale-[0.98]"
+            style={{ minHeight: 56 }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/20">
+                <ArrowDownRight className="h-6 w-6 text-red-400" />
+              </div>
+              <div>
+                <p className="text-lg font-semibold text-white">Add Expense</p>
+                <p className="text-sm text-slate-400">Track your spending</p>
+              </div>
             </div>
+          </button>
 
-          <div className="space-y-3">
-            <button
-              onClick={() => handleSelect('expense')}
-              className="w-full p-5 rounded-2xl bg-red-500/10 border-2 border-red-500/30 active:scale-[0.98] transition-all duration-200 cursor-pointer"
-              style={{ minHeight: 56 }}
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-red-500/20 flex items-center justify-center">
-                  <ArrowDownRight className="w-6 h-6 text-red-400" />
-                </div>
-                <div className="text-left">
-                  <p className="text-white font-semibold text-lg">Add Expense</p>
-                  <p className="text-slate-400 text-sm">Track your spending</p>
-                </div>
+          <button
+            type="button"
+            onClick={() => handleSelect('income')}
+            className="w-full rounded-2xl border-2 border-green-500/30 bg-green-500/10 p-5 text-left transition-all duration-200 active:scale-[0.98]"
+            style={{ minHeight: 56 }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-500/20">
+                <ArrowUpRight className="h-6 w-6 text-green-400" />
               </div>
-            </button>
-
-            <button
-              onClick={() => handleSelect('income')}
-              className="w-full p-5 rounded-2xl bg-green-500/10 border-2 border-green-500/30 active:scale-[0.98] transition-all duration-200 cursor-pointer"
-              style={{ minHeight: 56 }}
-            >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center">
-                  <ArrowUpRight className="w-6 h-6 text-green-400" />
-                </div>
-                <div className="text-left">
-                  <p className="text-white font-semibold text-lg">Add Income</p>
-                  <p className="text-slate-400 text-sm">Record your earnings</p>
-                </div>
+              <div>
+                <p className="text-lg font-semibold text-white">Add Income</p>
+                <p className="text-sm text-slate-400">Record your earnings</p>
               </div>
-            </button>
-          </div>
+            </div>
+          </button>
         </div>
       </DrawerContent>
     </Drawer>

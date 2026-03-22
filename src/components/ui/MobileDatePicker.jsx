@@ -42,11 +42,9 @@ export default function MobileDatePicker({
         disabled={disabled}
         onClick={() => setOpen(true)}
         className={cn(
-          "w-full flex items-center justify-between gap-3",
-          "h-14 px-4 rounded-xl",
-          "bg-slate-800 border border-slate-700",
-          "text-base transition-all duration-200",
-          "active:scale-[0.98] active:opacity-80",
+          "ui-input w-full flex items-center justify-between gap-3 rounded-[18px] border border-white/10 bg-[var(--field-surface)] px-[var(--space-4)] py-[calc(var(--space-3)+1px)] text-base shadow-[var(--shadow-soft)] transition-[border-color,box-shadow,background-color,transform] duration-200",
+          "min-h-[var(--control-height-lg)]",
+          "active:scale-[0.99]",
           disabled && "opacity-50 cursor-not-allowed",
           className
         )}
@@ -65,7 +63,7 @@ export default function MobileDatePicker({
         <SheetContent
           side="bottom"
           hideClose
-          className="bg-slate-900 border-t border-slate-700 rounded-t-3xl p-0"
+          className="rounded-t-3xl border-t border-slate-700 bg-slate-900 p-0 keyboard-sheet"
           style={{ maxHeight: '90dvh' }}
         >
           {/* Handle bar */}
