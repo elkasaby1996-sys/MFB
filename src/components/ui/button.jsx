@@ -5,15 +5,15 @@ import { cva } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
-  'ui-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--control-radius)] text-[length:var(--font-size-label)] font-semibold leading-none tracking-[0.01em] transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 active:scale-[0.985]',
+  'ui-button inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-[var(--control-radius)] text-[length:var(--font-size-label)] font-semibold leading-none transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 active:scale-[0.99]',
   {
     variants: {
       variant: {
-        default: 'bg-primary text-primary-foreground shadow-[var(--shadow-button)] hover:brightness-105',
-        destructive: 'bg-destructive text-destructive-foreground shadow-[var(--shadow-soft)] hover:brightness-105',
-        outline: 'border border-white/10 bg-white/[0.04] text-foreground shadow-[var(--shadow-soft)] hover:bg-white/[0.07]',
-        secondary: 'bg-secondary text-secondary-foreground shadow-[var(--shadow-soft)] hover:bg-secondary/80',
-        ghost: 'bg-transparent text-foreground hover:bg-white/[0.05]',
+        default: 'bg-primary text-primary-foreground shadow-[var(--shadow-button)] hover:brightness-110',
+        destructive: 'bg-destructive text-destructive-foreground shadow-[var(--shadow-button)] hover:brightness-110',
+        outline: 'border border-input bg-background/80 text-foreground shadow-[var(--shadow-soft)] hover:bg-accent hover:text-accent-foreground',
+        secondary: 'bg-secondary text-secondary-foreground shadow-[var(--shadow-soft)] hover:brightness-105',
+        ghost: 'bg-transparent text-foreground hover:bg-accent hover:text-accent-foreground',
         link: 'h-auto min-h-0 rounded-none px-0 text-primary underline-offset-4 hover:underline',
       },
       size: {

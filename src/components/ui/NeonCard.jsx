@@ -15,12 +15,10 @@ export default function NeonCard({ children, className, glowColor = 'cyan', hove
     <div
       onClick={onClick}
       className={cn(
-        'rounded-[26px] border border-[var(--surface-border)] bg-[var(--surface-raised)] backdrop-blur-xl',
-        'transition-all duration-200',
-        glowColors[glowColor] || glowColors.cyan,
-        hover && onClick && 'active:scale-[0.995]',
-        onClick && 'cursor-pointer',
-        className,
+        "rounded-[28px] border border-white/10 bg-slate-900/82 backdrop-blur-xl shadow-[var(--shadow-card)]",
+        "transition-all duration-300",
+        onClick && "cursor-pointer",
+        className
       )}
     >
       {children}

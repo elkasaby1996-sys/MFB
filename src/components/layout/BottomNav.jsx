@@ -187,12 +187,16 @@ export default function BottomNav({ currentPage }) {
             onClick={(e) => handleTabClick(e, item)}
             aria-label={`Navigate to ${item.name}`}
             aria-current={isActive ? 'page' : undefined}
-            label={item.name}
           >
-            {({ compact: compactMode }) => (
+            {({ compact: compactMode, duration, ease }) => (
               <item.icon
-                className={isActive ? 'text-slate-100' : 'text-slate-400'}
-                style={{ width: compactMode ? '17px' : '18px', height: compactMode ? '17px' : '18px' }}
+                style={{
+                  width: compactMode ? '17px' : '20px',
+                  height: compactMode ? '17px' : '20px',
+                  transition: `width ${duration} ${ease}, height ${duration} ${ease}, color ${duration} ${ease}`,
+                  willChange: 'width, height',
+                  color: isActive ? 'rgb(34,211,238)' : 'rgba(255,255,255,0.38)',
+                }}
                 aria-hidden="true"
               />
             )}
@@ -201,7 +205,6 @@ export default function BottomNav({ currentPage }) {
       })}
 
       <BottomTabBarAction
-        compact={isCompact}
         onClick={() => {
           nativeHaptics.confirm();
           const event = new CustomEvent('quickAddClick');
@@ -209,7 +212,7 @@ export default function BottomNav({ currentPage }) {
         }}
         aria-label="Add transaction"
       >
-        <Plus className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
+        <Plus className="h-6 w-6 text-white" strokeWidth={3} />
       </BottomTabBarAction>
 
       {NAV_ITEMS.slice(2).map((item) => {
@@ -223,12 +226,16 @@ export default function BottomNav({ currentPage }) {
             onClick={(e) => handleTabClick(e, item)}
             aria-label={`Navigate to ${item.name}`}
             aria-current={isActive ? 'page' : undefined}
-            label={item.name}
           >
-            {({ compact: compactMode }) => (
+            {({ compact: compactMode, duration, ease }) => (
               <item.icon
-                className={isActive ? 'text-slate-100' : 'text-slate-400'}
-                style={{ width: compactMode ? '17px' : '18px', height: compactMode ? '17px' : '18px' }}
+                style={{
+                  width: compactMode ? '17px' : '20px',
+                  height: compactMode ? '17px' : '20px',
+                  transition: `width ${duration} ${ease}, height ${duration} ${ease}, color ${duration} ${ease}`,
+                  willChange: 'width, height',
+                  color: isActive ? 'rgb(34,211,238)' : 'rgba(255,255,255,0.38)',
+                }}
                 aria-hidden="true"
               />
             )}

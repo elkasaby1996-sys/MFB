@@ -43,7 +43,7 @@ export default function MobileDatePicker({
         onClick={() => setOpen(true)}
         className={cn(
           "ui-input w-full flex items-center justify-between gap-3 rounded-[18px] border border-white/10 bg-[var(--field-surface)] px-[var(--space-4)] py-[calc(var(--space-3)+1px)] text-base shadow-[var(--shadow-soft)] transition-[border-color,box-shadow,background-color,transform] duration-200",
-          "min-h-[var(--control-height-md)]",
+          "min-h-[var(--control-height-lg)]",
           "active:scale-[0.99]",
           disabled && "opacity-50 cursor-not-allowed",
           className

@@ -29,15 +29,15 @@ export default function NeonProgress({
   };
 
   const sizes = {
-    xs: 'h-1.5',
-    sm: 'h-2',
-    md: 'h-2.5',
-    lg: 'h-4',
+    xs: "h-1.5",
+    sm: "h-2",
+    md: "h-2.5",
+    lg: "h-4"
   };
 
   return (
-    <div className={cn('w-full', className)}>
-      <div className={cn('w-full overflow-hidden rounded-full bg-white/8 ring-1 ring-white/6', sizes[size])}>
+    <div className={cn("w-full", className)}>
+      <div className={cn("w-full overflow-hidden rounded-full bg-white/8 ring-1 ring-white/6", sizes[size])}>
         <div
           className={cn('h-full rounded-full bg-gradient-to-r transition-all duration-300 ease-out', getColor())}
           style={{ width: percentage > 0 ? `${Math.max(percentage, 2)}%` : '0%' }}
