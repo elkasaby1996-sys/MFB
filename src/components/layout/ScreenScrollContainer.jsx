@@ -16,7 +16,13 @@ const widthMap = {
 /**
  * Scrollable screen container with pull-to-refresh and safe area support
  */
-export default function ScreenScrollContainer({ children, className, contentClassName, maxWidth = 'lg' }) {
+export default function ScreenScrollContainer({
+  children,
+  className,
+  contentClassName,
+  maxWidth = 'lg',
+  safeTop = true,
+}) {
   const scrollRef = useRef(null);
   const queryClient = useQueryClient();
   const controls = useAnimation();
@@ -86,7 +92,7 @@ export default function ScreenScrollContainer({ children, className, contentClas
   return (
     <div
       ref={scrollRef}
-      className={cn('screen-shell app-screen safe-top h-[100dvh] overflow-y-auto bg-background text-foreground', className)}
+      className={cn('screen-shell app-screen h-[100dvh] overflow-y-auto bg-background text-foreground', safeTop && 'safe-top', className)}
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
