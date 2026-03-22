@@ -3,40 +3,28 @@ import { ChevronLeft } from 'lucide-react';
 import { useNavigation } from '@/components/providers/NavigationProvider';
 import { cn } from '@/lib/utils';
 
-/**
- * Global sub-page header.
- * - Uses the NavigationProvider tab stack for back navigation.
- * - Falls back to navigate(-1) if no stack entry exists.
- * - `rightContent` lets pages inject an action button on the right.
- */
-export default function SubPageHeader({ title, rightContent, className }) {
-  const { goBack, canGoBack, backLabel } = useNavigation();
+export default function SubPageHeader({ title, subtitle, rightContent, className }) {
+  const { goBack, backLabel } = useNavigation();
 
   return (
-    <div
-      className={cn(
-        'flex items-center gap-2 pt-safe px-4 py-3 sticky top-0 z-[60] safe-x',
-        'bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50',
-        className
-      )}
-    >
-      <button
-        onClick={goBack}
-        className="flex items-center gap-1 text-cyan-400 min-h-[44px] min-w-[44px] -ml-2 px-2 active:opacity-70 transition-opacity"
-        aria-label="Back"
-      >
-        <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-        <span className="text-sm font-medium truncate max-w-[80px]">{backLabel}</span>
-      </button>
+    <header className={cn('sticky top-0 z-[60] border-b border-white/6 bg-slate-950/88 backdrop-blur-xl', className)}>
+      <div className="mx-auto flex w-full max-w-lg items-end gap-3 px-[var(--screen-gutter)] pb-3 pt-[max(calc(var(--safe-top)+8px),18px)]">
+        <button
+          onClick={goBack}
+          className="inline-flex h-10 min-w-[44px] items-center gap-1 rounded-full px-2.5 text-slate-200 transition-colors active:bg-white/[0.05]"
+          aria-label="Back"
+        >
+          <ChevronLeft className="h-5 w-5 shrink-0 text-slate-200" />
+          <span className="max-w-[88px] truncate text-[13px] font-medium text-slate-400">{backLabel}</span>
+        </button>
 
-      <h1 className="text-white font-semibold text-base flex-1 text-center truncate">
-        {title}
-      </h1>
+        <div className="min-w-0 flex-1 pb-0.5">
+          <h1 className="truncate text-[20px] font-semibold tracking-[-0.02em] text-white">{title}</h1>
+          {subtitle ? <p className="mt-0.5 truncate text-[13px] text-slate-500">{subtitle}</p> : null}
+        </div>
 
-      {/* Right slot — same width as back button to keep title centred */}
-      <div className="min-w-[44px] flex justify-end">
-        {rightContent ?? null}
+        <div className="flex min-w-[44px] items-center justify-end">{rightContent ?? null}</div>
       </div>
-    </div>
+    </header>
   );
 }

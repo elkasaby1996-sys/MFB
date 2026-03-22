@@ -3,31 +3,24 @@ import { Link, useNavigate } from 'react-router-dom';
 import { createPageUrl } from '@/utils';
 import { base44 } from '@/api/base44Client';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import SpaceBackground from '@/components/layout/SpaceBackground';
 import BottomNav from '@/components/layout/BottomNav';
 import ScreenScrollContainer from '@/components/layout/ScreenScrollContainer';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import NeonCard from '@/components/ui/NeonCard';
 import NeonButton from '@/components/ui/NeonButton';
 import NeonProgress from '@/components/ui/NeonProgress';
-import StatCard from '@/components/ui/StatCard';
 import StreakModal from '@/components/ui/StreakModal';
 import CategoryIcon, { getCategoryByName } from '@/components/ui/CategoryIcon';
-import SpendingDonutChart from '@/components/dashboard/SpendingDonutChart';
 import DailySpendingCircle from '@/components/dashboard/DailySpendingCircle';
-import HealthScoreCard from '@/components/health/HealthScoreCard';
-import { calculateFinancialHealthScore, getScoreLabel } from '@/components/health/calculateHealthScore';
+import { calculateFinancialHealthScore } from '@/components/health/calculateHealthScore';
 import { calculateDataPresence, getHealthScoreLabel } from '@/components/utils/dataPresence';
 import AddTransactionModal from '@/components/dashboard/AddTransactionModal';
 import QuickInsights from '@/components/dashboard/QuickInsights';
 import SalaryCheckModal from '@/components/salary/SalaryCheckModal';
 import DueSubscriptionsAlert from '@/components/subscription/DueSubscriptionsAlert';
-import QueryWrapper from '@/components/ui/QueryWrapper';
 import { 
-  Wallet, 
   TrendingUp, 
   TrendingDown, 
-  PiggyBank, 
   Target,
   Plus,
   ChevronRight,
@@ -39,7 +32,7 @@ import {
   X,
   Sparkles
 } from "lucide-react";
-import { format, startOfMonth, endOfMonth, subMonths } from 'date-fns';
+import { format, startOfMonth, endOfMonth } from 'date-fns';
 import { motion } from 'framer-motion';
 import { usePremium } from '@/components/providers/PremiumProvider';
 import { DashboardSkeleton } from '@/components/ui/SkeletonLoader';
@@ -279,7 +272,7 @@ export default function Dashboard() {
   return (
     <div className="bg-slate-950 min-h-screen">
       <ScreenScrollContainer>
-        <div className="max-w-lg mx-auto space-y-4 sm:space-y-6 py-4 px-4 sm:px-6">
+        <div className="mx-auto max-w-lg space-y-3.5 py-3.5 sm:space-y-4 sm:py-4">
           
           {/* Upgrade Banner for free users */}
           {currentTier === 'free' && !upgradeBannerDismissed && (
@@ -314,147 +307,124 @@ export default function Dashboard() {
 
           {/* Hero Welcome Card */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <NeonCard className="p-6" glowColor="cyan">
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex-1 min-w-0">
-                  <h1 className="text-white text-2xl font-bold mb-1">
-                    Hey {profile.name?.split(' ')[0] || 'Bro'}! 👽
+            <NeonCard className="p-4 sm:p-5" glowColor="cyan">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="text-[12px] font-medium text-slate-500">{format(now, 'EEEE, MMMM d')}</p>
+                  <h1 className="mt-1 truncate text-[24px] font-semibold tracking-[-0.03em] text-white">
+                    Hey {profile.name?.split(' ')[0] || 'there'}
                   </h1>
-                  <p className="text-slate-400 text-sm">
-                    {format(now, 'EEEE, MMMM d')}
+                  <p className="mt-1 text-sm text-slate-400">Your money snapshot for today.</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleStreakClick}
+                    className="inline-flex h-10 items-center gap-1.5 rounded-full border border-orange-400/15 bg-orange-500/10 px-3 text-orange-300 active:scale-[0.98]"
+                    aria-label={`Streak: ${profile.streak_days || 0} days`}
+                  >
+                    <span className="text-sm">🔥</span>
+                    <span className="text-[13px] font-semibold">{profile.streak_days || 0}d</span>
+                  </button>
+                  <NotificationBell />
+                </div>
+              </div>
+
+              <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-white/6 bg-white/[0.03] px-3.5 py-2.5">
+                <div>
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-slate-500">This month</p>
+                  <p className={`mt-1 font-semibold ${netCashFlow >= 0 ? 'text-emerald-300' : 'text-rose-300'} ${formatCurrency(netCashFlow).length > 10 ? 'text-lg' : 'text-xl'}`}>
+                    {netCashFlow >= 0 ? '+' : ''}{formatCurrency(netCashFlow)}
                   </p>
                 </div>
-                <NotificationBell />
-              </div>
-              <div className="flex items-center justify-end">
-                <button
-                  onClick={handleStreakClick}
-                  className="flex items-center gap-2 bg-orange-500/10 px-3 py-2 rounded-full border border-orange-500/20 active:scale-95 transition-all cursor-pointer"
-                  style={{ minHeight: 44, minWidth: 44 }}
-                  aria-label={`Streak: ${profile.streak_days || 0} days`}
-                >
-                  <span className="text-lg">🔥</span>
-                  <span className="text-orange-400 font-semibold text-sm">{profile.streak_days || 0} day</span>
-                </button>
+                <p className="max-w-[160px] text-right text-[13px] text-slate-400">{todaySpent > 0 ? `${formatCurrency(todaySpent)} spent today` : 'No spending recorded yet today'}</p>
               </div>
             </NeonCard>
           </motion.div>
 
           {/* Quick Actions */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
+            transition={{ delay: 0.08 }}
           >
-            <NeonCard className="p-4">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowAddModal(true)}
-                  className="flex-1 flex items-center justify-center gap-2 p-3 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 rounded-xl transition-all active:scale-95"
-                >
-                  <Plus className="w-5 h-5 text-cyan-400" />
-                </button>
-                <button
-                  onClick={() => {
-                    if (navigator.vibrate) {
-                      navigator.vibrate([10, 20, 10]);
-                    }
-                    navigate(createPageUrl("AIAssistant"));
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 p-3 bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/30 rounded-xl transition-all active:scale-95 relative"
-                  aria-label="AI Assistant"
-                  style={{
-                    animation: 'aiPulse 3s ease-in-out infinite'
-                  }}
-                >
-                  <Zap className="w-5 h-5 text-purple-400" />
-                </button>
-              </div>
-            </NeonCard>
+            <div className="grid grid-cols-2 gap-2.5">
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="flex min-h-[56px] items-center justify-between rounded-2xl border border-cyan-400/12 bg-white/[0.03] px-4 text-left transition-all active:scale-[0.985]"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-white">Add transaction</p>
+                  <p className="mt-0.5 text-[12px] text-slate-500">Log spending or income</p>
+                </div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-cyan-500/12">
+                  <Plus className="h-4 w-4 text-cyan-300" />
+                </div>
+              </button>
+              <button
+                onClick={() => {
+                  if (navigator.vibrate) navigator.vibrate([10, 20, 10]);
+                  navigate(createPageUrl('AIAssistant'));
+                }}
+                className="flex min-h-[56px] items-center justify-between rounded-2xl border border-purple-400/12 bg-white/[0.03] px-4 text-left transition-all active:scale-[0.985]"
+                aria-label="AI Assistant"
+              >
+                <div>
+                  <p className="text-sm font-semibold text-white">Ask AI</p>
+                  <p className="mt-0.5 text-[12px] text-slate-500">Get a quick money insight</p>
+                </div>
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-purple-500/12">
+                  <Zap className="h-4 w-4 text-purple-300" />
+                </div>
+              </button>
+            </div>
           </motion.div>
 
           {/* Key Metrics Grid 2x2 */}
-          <div className="grid grid-cols-2 gap-3">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.15 }}
-              onClick={() => navigate(createPageUrl("SpendingLog") + "?type=income")}
-            >
-              <NeonCard className="p-4 cursor-pointer active:scale-95 active:opacity-80 transition-all" glowColor="green">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-slate-300 text-xs font-semibold uppercase tracking-wide">Income</p>
-                  <div className="p-1.5 rounded-lg bg-green-500/20">
-                    <ArrowUpRight className="w-3.5 h-3.5 text-green-400" />
-                  </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.12 }} onClick={() => navigate(createPageUrl('SpendingLog') + '?type=income')}>
+              <NeonCard className="cursor-pointer p-3.5 active:scale-[0.985] active:opacity-80" glowColor="green">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Income</p>
+                  <div className="rounded-lg bg-green-500/12 p-1.5"><ArrowUpRight className="h-3.5 w-3.5 text-green-400" /></div>
                 </div>
-                <p className={`text-white font-extrabold ${formatCurrency(totalIncome).length > 10 ? 'text-lg' : formatCurrency(totalIncome).length > 8 ? 'text-xl' : 'text-2xl'}`}>
-                  {formatCurrency(totalIncome)}
-                </p>
-                <p className="text-green-400 text-xs mt-1">This month</p>
-              </NeonCard>
-            </motion.div>
-            
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              onClick={() => navigate(createPageUrl("SpendingLog") + "?type=expense")}
-            >
-              <NeonCard className="p-4 cursor-pointer active:scale-95 active:opacity-80 transition-all" glowColor="pink">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-slate-300 text-xs font-semibold uppercase tracking-wide">Expenses</p>
-                  <div className="p-1.5 rounded-lg bg-pink-500/20">
-                    <ArrowDownRight className="w-3.5 h-3.5 text-pink-400" />
-                  </div>
-                </div>
-                <p className={`text-white font-extrabold ${formatCurrency(totalExpenses).length > 10 ? 'text-lg' : formatCurrency(totalExpenses).length > 8 ? 'text-xl' : 'text-2xl'}`}>
-                  {formatCurrency(totalExpenses)}
-                </p>
-                <p className="text-pink-400 text-xs mt-1">This month</p>
+                <p className={`mt-3 text-white font-semibold tracking-tight ${formatCurrency(totalIncome).length > 10 ? 'text-lg' : formatCurrency(totalIncome).length > 8 ? 'text-[22px]' : 'text-2xl'}`}>{formatCurrency(totalIncome)}</p>
+                <p className="mt-1 text-[12px] text-slate-500">This month</p>
               </NeonCard>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.25 }}
-              onClick={() => navigate(createPageUrl("NetWorth"))}
-            >
-              <NeonCard className="p-4 cursor-pointer active:scale-95 active:opacity-80 transition-all" glowColor={netWorth >= 0 ? "green" : "pink"}>
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-slate-400 text-xs font-medium uppercase tracking-wide">Net Worth</p>
-                  <div className={`p-1.5 rounded-lg ${netWorth >= 0 ? 'bg-green-500/20' : 'bg-pink-500/20'}`}>
-                    <PieChart className={`w-3.5 h-3.5 ${netWorth >= 0 ? 'text-green-400' : 'text-pink-400'}`} />
-                  </div>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.16 }} onClick={() => navigate(createPageUrl('SpendingLog') + '?type=expense')}>
+              <NeonCard className="cursor-pointer p-3.5 active:scale-[0.985] active:opacity-80" glowColor="pink">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Expenses</p>
+                  <div className="rounded-lg bg-pink-500/12 p-1.5"><ArrowDownRight className="h-3.5 w-3.5 text-pink-400" /></div>
                 </div>
-                <p className={`font-bold ${netWorth >= 0 ? 'text-green-400' : 'text-red-400'} ${formatCurrency(netWorth).length > 10 ? 'text-base' : formatCurrency(netWorth).length > 8 ? 'text-lg' : 'text-xl'}`}>
-                  {formatCurrency(netWorth)}
-                </p>
-                <p className="text-slate-400 text-xs mt-1">Total assets</p>
+                <p className={`mt-3 text-white font-semibold tracking-tight ${formatCurrency(totalExpenses).length > 10 ? 'text-lg' : formatCurrency(totalExpenses).length > 8 ? 'text-[22px]' : 'text-2xl'}`}>{formatCurrency(totalExpenses)}</p>
+                <p className="mt-1 text-[12px] text-slate-500">This month</p>
               </NeonCard>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-              onClick={() => navigate(createPageUrl("Savings"))}
-            >
-              <NeonCard className="p-4 cursor-pointer active:scale-95 active:opacity-80 transition-all" glowColor="teal">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-slate-400 text-xs font-medium uppercase tracking-wide">Savings</p>
-                  <div className="p-1.5 rounded-lg bg-teal-500/20">
-                    <Target className="w-3.5 h-3.5 text-teal-400" />
-                  </div>
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} onClick={() => navigate(createPageUrl('NetWorth'))}>
+              <NeonCard className="cursor-pointer p-3.5 active:scale-[0.985] active:opacity-80" glowColor={netWorth >= 0 ? 'green' : 'pink'}>
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Net worth</p>
+                  <div className={`rounded-lg p-1.5 ${netWorth >= 0 ? 'bg-green-500/12' : 'bg-pink-500/12'}`}><PieChart className={`h-3.5 w-3.5 ${netWorth >= 0 ? 'text-green-400' : 'text-pink-400'}`} /></div>
                 </div>
-                <p className={`text-teal-400 font-bold ${formatCurrency(totalSavings).length > 10 ? 'text-base' : formatCurrency(totalSavings).length > 8 ? 'text-lg' : 'text-xl'}`}>
-                  {formatCurrency(totalSavings)}
-                </p>
-                <p className="text-slate-400 text-xs mt-1">{savingsGoals.length} goals</p>
+                <p className={`mt-3 font-semibold tracking-tight ${netWorth >= 0 ? 'text-green-300' : 'text-rose-300'} ${formatCurrency(netWorth).length > 10 ? 'text-base' : formatCurrency(netWorth).length > 8 ? 'text-lg' : 'text-xl'}`}>{formatCurrency(netWorth)}</p>
+                <p className="mt-1 text-[12px] text-slate-500">Total assets</p>
+              </NeonCard>
+            </motion.div>
+
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.24 }} onClick={() => navigate(createPageUrl('Savings'))}>
+              <NeonCard className="cursor-pointer p-3.5 active:scale-[0.985] active:opacity-80" glowColor="teal">
+                <div className="flex items-center justify-between">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-slate-500">Savings</p>
+                  <div className="rounded-lg bg-teal-500/12 p-1.5"><Target className="h-3.5 w-3.5 text-teal-400" /></div>
+                </div>
+                <p className={`mt-3 font-semibold tracking-tight text-teal-300 ${formatCurrency(totalSavings).length > 10 ? 'text-base' : formatCurrency(totalSavings).length > 8 ? 'text-lg' : 'text-xl'}`}>{formatCurrency(totalSavings)}</p>
+                <p className="mt-1 text-[12px] text-slate-500">{savingsGoals.length} goals</p>
               </NeonCard>
             </motion.div>
           </div>

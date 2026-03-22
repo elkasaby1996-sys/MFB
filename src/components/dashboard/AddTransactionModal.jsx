@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
-import { Sheet, SheetContent } from "@/components/ui/sheet";
+import { Sheet, SheetContent } from '@/components/ui/sheet';
 import SegmentedControl from '@/components/ui/SegmentedControl';
 import MobileSelect from '@/components/ui/MobileSelect';
-import { Input } from "@/components/ui/input";
+import { Input } from '@/components/ui/input';
 import MobileDatePicker from '@/components/ui/MobileDatePicker';
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import NeonButton from '@/components/ui/NeonButton';
 import AmountInput from '@/components/ui/AmountInput';
-import { ArrowUpRight, ArrowDownRight } from "lucide-react";
+import { ArrowUpRight, ArrowDownRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { PRIMARY_CATEGORIES, HOME_SUBCATEGORIES, INCOME_CATEGORIES, validateCategoryStructure } from '@/components/utils/categoryConstants';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
@@ -29,7 +29,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
     notes: '',
     merchant: '',
     savings_goal_id: '',
-    debt_id: ''
+    debt_id: '',
   });
   const [categoryError, setCategoryError] = useState(false);
   const [subCategoryError, setSubCategoryError] = useState(false);
@@ -37,13 +37,13 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
   const { data: savingsGoals = [] } = useQuery({
     queryKey: ['savingsGoals'],
     queryFn: () => base44.entities.SavingsGoal.list('-created_date'),
-    enabled: isOpen
+    enabled: isOpen,
   });
 
   const { data: debts = [] } = useQuery({
     queryKey: ['debts'],
     queryFn: () => base44.entities.Debt.list('-created_date'),
-    enabled: isOpen
+    enabled: isOpen,
   });
 
   useEffect(() => {
@@ -56,12 +56,12 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
       await queryClient.cancelQueries({ queryKey: ['transactions'] });
       const previousTransactions = queryClient.getQueryData(['transactions']);
       queryClient.setQueryData(['transactions'], (old = []) => [
-      { ...newTransaction, id: `temp-${Date.now()}`, created_date: new Date().toISOString(), updated_date: new Date().toISOString(), created_by: profile?.email || 'user' },
-      ...old]
-      );
+        { ...newTransaction, id: `temp-${Date.now()}`, created_date: new Date().toISOString(), updated_date: new Date().toISOString(), created_by: profile?.email || 'user' },
+        ...old,
+      ]);
       return { previousTransactions };
     },
-    onError: (err, newTransaction, context) => {
+    onError: (err, _newTransaction, context) => {
       queryClient.setQueryData(['transactions'], context.previousTransactions);
       handleApiError(err, { title: 'Transaction Error', context: 'add-transaction' });
     },
@@ -73,22 +73,25 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
       nativeHaptics.notifySuccess();
       toast.success('Transaction added successfully!');
       handleClose();
-    }
+    },
   });
 
   const updateGoalMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.SavingsGoal.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries(['savingsGoals'])
+    onSuccess: () => queryClient.invalidateQueries(['savingsGoals']),
   });
 
   const updateDebtMutation = useMutation({
     mutationFn: ({ id, data }) => base44.entities.Debt.update(id, data),
-    onSuccess: () => queryClient.invalidateQueries(['debts'])
+    onSuccess: () => queryClient.invalidateQueries(['debts']),
   });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.category) {setCategoryError(true);return;}
+    if (!formData.category) {
+      setCategoryError(true);
+      return;
+    }
 
     const validation = validateCategoryStructure(formData.category, formData.subCategory);
     if (!validation.valid) {
@@ -117,7 +120,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
       notes: formData.notes || null,
       merchant: formData.merchant || null,
       currency: profile?.currency || 'USD',
-      linkedDebtId: formData.debt_id || null
+      linkedDebtId: formData.debt_id || null,
     };
 
     if (formData.category === 'Savings' && formData.savings_goal_id) {
@@ -175,41 +178,40 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
 
   return (
     <Sheet open={isOpen} onOpenChange={handleClose}>
-      <SheetContent side="bottom" hideClose className="bg-slate-950 border-slate-800 rounded-t-3xl flex flex-col" style={{ paddingBottom: 0 }}>
-        {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-4">
-          <div className="w-10 h-1 bg-slate-700 rounded-full" />
-        </div>
-        
-        <div className="px-5 pb-4">
-          <h3 className="text-white text-lg font-semibold">Add Transaction</h3>
+      <SheetContent side="bottom" hideClose className="flex flex-col rounded-t-[28px] border-slate-800 bg-slate-950" style={{ paddingBottom: 0 }}>
+        <div className="flex justify-center pt-3">
+          <div className="h-1 w-10 rounded-full bg-slate-700" />
         </div>
 
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
-          <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
+        <div className="px-5 pb-3 pt-3">
+          <h3 className="text-lg font-semibold text-white">Add transaction</h3>
+          <p className="mt-1 text-sm text-slate-500">Capture the essentials without leaving the flow.</p>
+        </div>
 
-            {/* Type Toggle */}
-            <SegmentedControl
-              value={transactionType}
-              onValueChange={handleTypeChange}
-              size="lg"
-              fullWidth
-              ariaLabel="Transaction type"
-              options={[
-                { value: 'expense', label: 'Expense', icon: ArrowDownRight, className: transactionType === 'expense' ? '!text-rose-600' : undefined },
-                { value: 'income', label: 'Income', icon: ArrowUpRight, className: transactionType === 'income' ? '!text-emerald-600' : undefined },
-              ]}
-            />
-
-            {/* Amount */}
-            <div>
-              <Label className="text-slate-300 text-sm font-medium">Amount</Label>
-              <AmountInput value={formData.amount} onChange={(value) => setFormData((prev) => ({ ...prev, amount: value }))} currency={profile?.currency || 'USD'} className="bg-slate-800 border-slate-700 text-white h-14 mt-2 text-xl" required />
+        <form onSubmit={handleSubmit} className="flex min-h-0 flex-1 flex-col overflow-hidden">
+          <div className="flex-1 space-y-4 overflow-y-auto px-4 pb-4 pt-2 sm:px-5">
+            <div className="space-y-2">
+              <Label>Type</Label>
+              <SegmentedControl
+                value={transactionType}
+                onValueChange={handleTypeChange}
+                size="md"
+                fullWidth
+                ariaLabel="Transaction type"
+                options={[
+                  { value: 'expense', label: 'Expense', icon: ArrowDownRight, className: transactionType === 'expense' ? '!text-rose-600' : undefined },
+                  { value: 'income', label: 'Income', icon: ArrowUpRight, className: transactionType === 'income' ? '!text-emerald-600' : undefined },
+                ]}
+              />
             </div>
 
-            {/* Category */}
-            <div>
-              <Label className="text-slate-300 text-sm font-medium">Category</Label>
+            <div className="space-y-2">
+              <Label>Amount</Label>
+              <AmountInput value={formData.amount} onChange={(value) => setFormData((prev) => ({ ...prev, amount: value }))} currency={profile?.currency || 'USD'} className="h-12 bg-slate-800/90 text-[22px]" required />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Category</Label>
               <MobileSelect
                 value={formData.category}
                 onValueChange={handleCategorySelect}
@@ -217,97 +219,80 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
                 placeholder="Select category"
                 title="Select Category"
                 error={categoryError}
-                triggerClassName="mt-2" />
-
-              {categoryError && <p className="text-red-400 text-sm mt-1">Please select a category</p>}
-            </div>
-
-            {/* Home Sub-Category */}
-            {formData.category === 'Home Expenses' &&
-            <div>
-                <Label className="text-slate-300 text-sm font-medium">Home Type *</Label>
-                <MobileSelect
-                value={formData.subCategory}
-                onValueChange={handleSubCategorySelect}
-                options={HOME_SUBCATEGORIES.map((sc) => ({ value: sc.name, label: sc.name, icon: sc.icon }))}
-                placeholder="Select home category"
-                title="Select Home Type"
-                error={subCategoryError}
-                triggerClassName="mt-2" />
-
-                {subCategoryError && <p className="text-red-400 text-sm mt-1">Please select a home category</p>}
-              </div>
-            }
-
-            {/* Date */}
-            <div>
-              <Label className="text-slate-300 text-sm font-medium">Date</Label>
-              <MobileDatePicker
-                value={formData.date}
-                onChange={(date) => setFormData((prev) => ({ ...prev, date }))}
-                className="mt-2"
               />
+              {categoryError ? <p className="text-sm text-red-400">Please select a category</p> : null}
             </div>
 
-            {/* Savings Goal */}
-            {formData.category === 'Savings' &&
-            <div>
-                <Label className="text-slate-300 text-sm font-medium">Select Savings Goal</Label>
+            {formData.category === 'Home Expenses' ? (
+              <div className="space-y-2">
+                <Label>Home type</Label>
                 <MobileSelect
-                value={formData.savings_goal_id}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, savings_goal_id: value }))}
-                options={savingsGoals.map((g) => ({ value: g.id, label: g.name, icon: g.icon }))}
-                placeholder={savingsGoals.length === 0 ? 'No goals yet — create one first' : 'Choose a goal'}
-                title="Select Savings Goal"
-                disabled={savingsGoals.length === 0}
-                triggerClassName="mt-2" />
-
+                  value={formData.subCategory}
+                  onValueChange={handleSubCategorySelect}
+                  options={HOME_SUBCATEGORIES.map((sc) => ({ value: sc.name, label: sc.name, icon: sc.icon }))}
+                  placeholder="Select home category"
+                  title="Select Home Type"
+                  error={subCategoryError}
+                />
+                {subCategoryError ? <p className="text-sm text-red-400">Please select a home category</p> : null}
               </div>
-            }
+            ) : null}
 
-            {/* Debt Selector */}
-            {formData.category === 'Debt' &&
-            <div>
-                <Label className="text-slate-300 text-sm font-medium">Which Debt? *</Label>
-                <MobileSelect
-                value={formData.debt_id}
-                onValueChange={(value) => setFormData((prev) => ({ ...prev, debt_id: value }))}
-                options={debts.map((d) => ({ value: d.id, label: d.name, icon: '💳', description: `Balance: ${profile?.currency || 'USD'} ${d.current_balance?.toFixed(2)}` }))}
-                placeholder={debts.length === 0 ? 'No debts found — add one first' : 'Select a debt'}
-                title="Select Debt"
-                disabled={debts.length === 0}
-                triggerClassName="mt-2" />
-
-                {formData.debt_id && <p className="text-cyan-400 text-xs mt-2">💡 This payment will be tracked against your selected debt</p>}
-              </div>
-            }
-
-            {/* Merchant */}
-            <div>
-              <Label className="text-slate-300 text-sm font-medium">Merchant (Optional)</Label>
-              <Input value={formData.merchant} onChange={(e) => setFormData((prev) => ({ ...prev, merchant: e.target.value }))} placeholder="e.g. Starbucks" className="bg-slate-800 border-slate-700 text-white mt-2 h-14" />
+            <div className="space-y-2">
+              <Label>Date</Label>
+              <MobileDatePicker value={formData.date} onChange={(date) => setFormData((prev) => ({ ...prev, date }))} />
             </div>
 
-            {/* Notes */}
-              <div>
-              <div className="flex items-center justify-between">
-                <Label className="text-slate-300 text-sm font-medium">Notes (Optional)</Label>
+            {formData.category === 'Savings' ? (
+              <div className="space-y-2">
+                <Label>Savings goal</Label>
+                <MobileSelect
+                  value={formData.savings_goal_id}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, savings_goal_id: value }))}
+                  options={savingsGoals.map((g) => ({ value: g.id, label: g.name, icon: g.icon }))}
+                  placeholder={savingsGoals.length === 0 ? 'No goals yet — create one first' : 'Choose a goal'}
+                  title="Select Savings Goal"
+                  disabled={savingsGoals.length === 0}
+                />
+              </div>
+            ) : null}
+
+            {formData.category === 'Debt' ? (
+              <div className="space-y-2">
+                <Label>Debt account</Label>
+                <MobileSelect
+                  value={formData.debt_id}
+                  onValueChange={(value) => setFormData((prev) => ({ ...prev, debt_id: value }))}
+                  options={debts.map((d) => ({ value: d.id, label: d.name, icon: '💳', description: `Balance: ${profile?.currency || 'USD'} ${d.current_balance?.toFixed(2)}` }))}
+                  placeholder={debts.length === 0 ? 'No debts found — add one first' : 'Select a debt'}
+                  title="Select Debt"
+                  disabled={debts.length === 0}
+                />
+                {formData.debt_id ? <p className="text-xs text-cyan-400">This payment will be tracked against your selected debt.</p> : null}
+              </div>
+            ) : null}
+
+            <div className="space-y-2">
+              <Label>Merchant</Label>
+              <Input value={formData.merchant} onChange={(e) => setFormData((prev) => ({ ...prev, merchant: e.target.value }))} placeholder="Starbucks" className="bg-slate-800/90" />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <Label>Notes</Label>
                 <span className="text-xs text-slate-500">{(formData.notes || '').length}/100</span>
               </div>
-              <Textarea value={formData.notes} onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))} placeholder="Add a note..." className="bg-slate-800 border-slate-700 text-white mt-2 min-h-[100px]" rows={4} maxLength={100} />
+              <Textarea value={formData.notes} onChange={(e) => setFormData((prev) => ({ ...prev, notes: e.target.value }))} placeholder="Add a note" className="min-h-[92px] bg-slate-800/90" rows={4} maxLength={100} />
             </div>
-
-            <div className="h-4" />
           </div>
 
-          {/* Sticky Footer */}
-          <div className="flex-shrink-0 border-t border-slate-800 bg-slate-950 px-5 py-4" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
-            <NeonButton type="submit" haptic="confirm" loading={createMutation.isPending} disabled={!formData.amount || !formData.category} className="w-full min-h-[52px] text-base font-semibold">
-              Add Transaction
+          <div className="flex-shrink-0 border-t border-slate-800/90 bg-slate-950/95 px-4 py-3 backdrop-blur" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)' }}>
+            <NeonButton type="submit" haptic="confirm" loading={createMutation.isPending} disabled={!formData.amount || !formData.category} className="w-full min-h-[48px] rounded-2xl text-[15px] font-semibold">
+              Add transaction
             </NeonButton>
           </div>
         </form>
       </SheetContent>
-    </Sheet>);
-
+    </Sheet>
+  );
 }

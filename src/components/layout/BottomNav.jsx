@@ -10,6 +10,7 @@ import {
   Plus
 } from "lucide-react";
 import { nativeHaptics } from '@/lib/native';
+import { BottomTabBar, BottomTabBarAction, BottomTabBarItem } from '@/components/layout/BottomTabBar';
 
 const NAV_ITEMS = [
   { name: 'Home', icon: Home, page: 'Dashboard', path: '/Dashboard' },
@@ -173,141 +174,67 @@ export default function BottomNav({ currentPage }) {
   // When reduced motion: no shrink at all
   const isCompact = compact && !prefersReducedMotion;
 
-  // Easing for all transitions
-  const ease = 'cubic-bezier(0.4, 0, 0.2, 1)';
-  const dur  = '380ms';
-
   return (
-    <nav
-      role="navigation"
-      aria-label="Main navigation"
-      className="fixed left-0 right-0 z-50 px-safe"
-      style={{ bottom: 'max(16px, calc(var(--safe-bottom) + 8px))' }}
-    >
-      <div
-        style={{
-          margin: isCompact ? '0 20px' : '0 12px',
-          borderRadius: '22px',
-          background: 'rgba(6, 182, 212, 0.05)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          border: '1px solid rgba(0, 255, 255, 0.2)',
-          transition: `margin ${dur} ${ease}`,
-          willChange: 'margin',
-        }}
-      >
-        <div
-          className="flex items-center justify-around px-1 relative"
-          style={{
-            paddingTop:    isCompact ? '6px'  : '6px',
-            paddingBottom: isCompact ? '6px'  : '6px',
-          }}
-        >
-          {NAV_ITEMS.slice(0, 2).map((item) => {
-            const isActive = currentTab === item.path;
+    <BottomTabBar compact={isCompact}>
+      {NAV_ITEMS.slice(0, 2).map((item) => {
+        const isActive = currentTab === item.path || activePage === item.page;
 
-            return (
-              <button
-                key={item.name}
-                onClick={(e) => handleTabClick(e, item)}
-                className="flex items-center justify-center rounded-2xl cursor-pointer active:scale-90 active:opacity-60"
-                style={{
-                  minWidth: '44px',
-                  minHeight: '44px',
-                  paddingLeft: '4px',
-                  paddingRight: '4px',
-                }}
-                aria-label={`Navigate to ${item.name}`}
-                aria-current={isActive ? 'page' : undefined}
-                type="button"
-              >
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    width:  isCompact ? '30px' : '34px',
-                    height: isCompact ? '30px' : '34px',
-                    transition: `width ${dur} ${ease}, height ${dur} ${ease}`,
-                    willChange: 'width, height',
-                  }}
-                >
-                  <item.icon
-                    style={{
-                      width:  isCompact ? '17px' : '20px',
-                      height: isCompact ? '17px' : '20px',
-                      transition: `width ${dur} ${ease}, height ${dur} ${ease}, color ${dur} ${ease}`,
-                      willChange: 'width, height',
-                      color: isActive ? 'rgb(34,211,238)' : 'rgba(255,255,255,0.38)',
-                    }}
-                    aria-hidden="true"
-                  />
-                </div>
-              </button>
-            );
-          })}
-
-          <button
-            onClick={() => {
-              nativeHaptics.confirm();
-              const event = new CustomEvent('quickAddClick');
-              window.dispatchEvent(event);
-            }}
-            aria-label="Add transaction"
-            className="flex items-center justify-center rounded-full cursor-pointer active:scale-90 active:opacity-60 transition-transform duration-200"
-            style={{
-              width: '48px',
-              height: '48px',
-              background: 'rgba(6, 182, 212, 0.15)',
-              backdropFilter: 'blur(8px)',
-              border: '1px solid rgba(0, 255, 255, 0.3)',
-            }}
-            type="button"
+        return (
+          <BottomTabBarItem
+            key={item.name}
+            compact={isCompact}
+            active={isActive}
+            onClick={(e) => handleTabClick(e, item)}
+            aria-label={`Navigate to ${item.name}`}
+            aria-current={isActive ? 'page' : undefined}
+            label={item.name}
           >
-            <Plus className="w-6 h-6 text-white" strokeWidth={3} />
-          </button>
+            {({ compact: compactMode }) => (
+              <item.icon
+                className={isActive ? 'text-slate-100' : 'text-slate-400'}
+                style={{ width: compactMode ? '17px' : '18px', height: compactMode ? '17px' : '18px' }}
+                aria-hidden="true"
+              />
+            )}
+          </BottomTabBarItem>
+        );
+      })}
 
-          {NAV_ITEMS.slice(2).map((item) => {
-            const isActive = currentTab === item.path;
+      <BottomTabBarAction
+        compact={isCompact}
+        onClick={() => {
+          nativeHaptics.confirm();
+          const event = new CustomEvent('quickAddClick');
+          window.dispatchEvent(event);
+        }}
+        aria-label="Add transaction"
+      >
+        <Plus className="h-[18px] w-[18px] text-white" strokeWidth={2.5} />
+      </BottomTabBarAction>
 
-            return (
-              <button
-                key={item.name}
-                onClick={(e) => handleTabClick(e, item)}
-                className="flex items-center justify-center rounded-2xl cursor-pointer active:scale-90 active:opacity-60"
-                style={{
-                  minWidth: '40px',
-                  minHeight: '40px',
-                  paddingLeft: '4px',
-                  paddingRight: '4px',
-                }}
-                aria-label={`Navigate to ${item.name}`}
-                aria-current={isActive ? 'page' : undefined}
-                type="button"
-              >
-                <div
-                  className="flex items-center justify-center"
-                  style={{
-                    width:  isCompact ? '30px' : '34px',
-                    height: isCompact ? '30px' : '34px',
-                    transition: `width ${dur} ${ease}, height ${dur} ${ease}`,
-                    willChange: 'width, height',
-                  }}
-                >
-                  <item.icon
-                    style={{
-                      width:  isCompact ? '17px' : '20px',
-                      height: isCompact ? '17px' : '20px',
-                      transition: `width ${dur} ${ease}, height ${dur} ${ease}, color ${dur} ${ease}`,
-                      willChange: 'width, height',
-                      color: isActive ? 'rgb(34,211,238)' : 'rgba(255,255,255,0.38)',
-                    }}
-                    aria-hidden="true"
-                  />
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    </nav>
+      {NAV_ITEMS.slice(2).map((item) => {
+        const isActive = currentTab === item.path || activePage === item.page;
+
+        return (
+          <BottomTabBarItem
+            key={item.name}
+            compact={isCompact}
+            active={isActive}
+            onClick={(e) => handleTabClick(e, item)}
+            aria-label={`Navigate to ${item.name}`}
+            aria-current={isActive ? 'page' : undefined}
+            label={item.name}
+          >
+            {({ compact: compactMode }) => (
+              <item.icon
+                className={isActive ? 'text-slate-100' : 'text-slate-400'}
+                style={{ width: compactMode ? '17px' : '18px', height: compactMode ? '17px' : '18px' }}
+                aria-hidden="true"
+              />
+            )}
+          </BottomTabBarItem>
+        );
+      })}
+    </BottomTabBar>
   );
 }
