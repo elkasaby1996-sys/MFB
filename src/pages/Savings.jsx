@@ -159,13 +159,7 @@ export default function Savings() {
   };
 
   const resetForm = () => {
-    setFormData({
-      name: '',
-      target_amount: '',
-      target_date: '',
-      icon: '🎯',
-      color: 'cyan',
-    });
+    setFormData({ name: '', target_amount: '', target_date: '', icon: '🎯', color: 'cyan' });
     setEditingGoal(null);
   };
 

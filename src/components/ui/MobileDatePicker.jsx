@@ -79,7 +79,7 @@ export default function MobileDatePicker({
             >
               Cancel
             </button>
-            <span className="text-white font-semibold text-base">Select Date</span>
+            <span className="text-white font-semibold text-base">Choose date</span>
             <button
               onClick={() => setOpen(false)}
               className="text-cyan-400 text-sm font-semibold active:text-cyan-300 transition-colors min-h-[44px] px-2"
