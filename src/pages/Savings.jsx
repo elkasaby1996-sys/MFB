@@ -205,7 +205,11 @@ export default function Savings() {
         }
       />
 
-      <ScreenScrollContainer className="bg-slate-950" contentClassName="pb-[calc(var(--tabbar-offset)+var(--space-6))]">
+      <ScreenScrollContainer
+        className="bg-slate-950"
+        contentClassName="pb-[calc(var(--tabbar-offset)+var(--space-6))]"
+        safeTop={false}
+      >
         <SpaceBackground>
           <div className="mx-auto flex w-full max-w-lg flex-col gap-4 py-4 sm:gap-5 sm:py-5">
             <NeonCard className="overflow-hidden p-5 sm:p-6" glowColor="teal">

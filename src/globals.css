@@ -114,6 +114,7 @@
     background-image: radial-gradient(circle at top, rgba(15, 23, 42, 0.85), rgba(2, 8, 23, 1) 58%);
     font-family: 'Inter', system-ui, sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
+    margin: 0;
     min-width: 320px;
     min-height: 100dvh;
     -webkit-font-smoothing: antialiased;

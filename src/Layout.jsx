@@ -12,7 +12,6 @@ import QuickAddSheet from '@/components/ui/QuickAddSheet';
 import AddTransactionModal from '@/components/dashboard/AddTransactionModal';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { isNativePlatform } from '@/lib/native';
 import { useKeyboardAwareLayout } from '@/hooks/useKeyboardAwareLayout';
 
 
@@ -77,9 +76,10 @@ export default function Layout({ children, currentPageName }) {
                   <AnimatePresence mode="wait">
                     <motion.div
                       key={currentPageName}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -8 }}
+                      className="min-h-[100dvh]"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
                       transition={{ duration: 0.18, ease: 'easeOut' }}
                     >
                       {children}
