@@ -21,7 +21,7 @@ export default function NeonCard({
     <div
       onClick={onClick}
       className={cn(
-        "bg-slate-900/80 backdrop-blur-xl rounded-2xl border border-slate-700/50",
+        "rounded-[28px] border border-white/10 bg-slate-900/82 backdrop-blur-xl shadow-[var(--shadow-card)]",
         "transition-all duration-300",
         onClick && "cursor-pointer",
         className
