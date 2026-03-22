@@ -4,6 +4,23 @@ module.exports = {
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
   	extend: {
+		spacing: {
+			'control-sm': 'var(--control-height-sm)',
+			'control-md': 'var(--control-height-md)',
+			'control-lg': 'var(--control-height-lg)',
+			'screen-gutter': 'var(--screen-gutter)'
+		},
+		fontSize: {
+			caption: 'var(--font-size-caption)',
+			body: ['var(--font-size-body)', { lineHeight: 'var(--line-height-body)' }],
+			label: 'var(--font-size-label)',
+			title: ['var(--font-size-title)', { lineHeight: 'var(--line-height-title)' }]
+		},
+		boxShadow: {
+			soft: 'var(--shadow-soft)',
+			card: 'var(--shadow-card)',
+			button: 'var(--shadow-button)'
+		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
