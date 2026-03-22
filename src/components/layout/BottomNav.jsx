@@ -191,11 +191,11 @@ export default function BottomNav({ currentPage }) {
             {({ compact: compactMode, duration, ease }) => (
               <item.icon
                 style={{
-                  width: compactMode ? '18px' : '19px',
-                  height: compactMode ? '18px' : '19px',
+                  width: compactMode ? '17px' : '20px',
+                  height: compactMode ? '17px' : '20px',
                   transition: `width ${duration} ${ease}, height ${duration} ${ease}, color ${duration} ${ease}`,
                   willChange: 'width, height',
-                  color: isActive ? 'rgba(232, 249, 255, 0.98)' : 'rgba(203,213,225,0.62)',
+                  color: isActive ? 'rgb(34,211,238)' : 'rgba(255,255,255,0.38)',
                 }}
                 aria-hidden="true"
               />
@@ -205,7 +205,6 @@ export default function BottomNav({ currentPage }) {
       })}
 
       <BottomTabBarAction
-        compact={isCompact}
         onClick={() => {
           nativeHaptics.confirm();
           const event = new CustomEvent('quickAddClick');
@@ -213,7 +212,7 @@ export default function BottomNav({ currentPage }) {
         }}
         aria-label="Add transaction"
       >
-        <Plus className="h-5 w-5 text-white" strokeWidth={2.75} />
+        <Plus className="h-6 w-6 text-white" strokeWidth={3} />
       </BottomTabBarAction>
 
       {NAV_ITEMS.slice(2).map((item) => {
@@ -231,11 +230,11 @@ export default function BottomNav({ currentPage }) {
             {({ compact: compactMode, duration, ease }) => (
               <item.icon
                 style={{
-                  width: compactMode ? '18px' : '19px',
-                  height: compactMode ? '18px' : '19px',
+                  width: compactMode ? '17px' : '20px',
+                  height: compactMode ? '17px' : '20px',
                   transition: `width ${duration} ${ease}, height ${duration} ${ease}, color ${duration} ${ease}`,
                   willChange: 'width, height',
-                  color: isActive ? 'rgba(232, 249, 255, 0.98)' : 'rgba(203,213,225,0.62)',
+                  color: isActive ? 'rgb(34,211,238)' : 'rgba(255,255,255,0.38)',
                 }}
                 aria-hidden="true"
               />
