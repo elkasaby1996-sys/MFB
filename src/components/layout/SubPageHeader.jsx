@@ -5,38 +5,31 @@ import { cn } from '@/lib/utils';
 
 /**
  * Global sub-page header.
- * - Uses the NavigationProvider tab stack for back navigation.
- * - Falls back to navigate(-1) if no stack entry exists.
- * - `rightContent` lets pages inject an action button on the right.
  */
 export default function SubPageHeader({ title, rightContent, className }) {
-  const { goBack, canGoBack, backLabel } = useNavigation();
+  const { goBack, backLabel } = useNavigation();
 
   return (
     <div
       className={cn(
-        'flex items-center gap-2 pt-safe px-4 py-3 sticky top-0 z-[60] safe-x',
-        'bg-slate-950/90 backdrop-blur-xl border-b border-slate-800/50',
-        className
+        'sticky top-0 z-[60] flex items-center gap-2 border-b border-white/6 bg-slate-950/82 px-4 py-3 pt-safe backdrop-blur-xl safe-x',
+        className,
       )}
     >
       <button
         onClick={goBack}
-        className="flex items-center gap-1 text-cyan-400 min-h-[44px] min-w-[44px] -ml-2 px-2 active:opacity-70 transition-opacity"
+        className="-ml-2 inline-flex min-h-[44px] min-w-[44px] items-center gap-1.5 rounded-2xl px-2 text-slate-200 transition-colors active:bg-white/[0.05]"
         aria-label="Back"
       >
-        <ChevronLeft className="w-5 h-5 flex-shrink-0" />
-        <span className="text-sm font-medium truncate max-w-[80px]">{backLabel}</span>
+        <ChevronLeft className="h-5 w-5 shrink-0 text-cyan-300" />
+        <span className="max-w-[84px] truncate text-sm font-medium text-slate-300">{backLabel}</span>
       </button>
 
-      <h1 className="text-white font-semibold text-base flex-1 text-center truncate">
+      <h1 className="flex-1 truncate text-center text-[15px] font-semibold tracking-[0.01em] text-white">
         {title}
       </h1>
 
-      {/* Right slot — same width as back button to keep title centred */}
-      <div className="min-w-[44px] flex justify-end">
-        {rightContent ?? null}
-      </div>
+      <div className="flex min-w-[44px] justify-end">{rightContent ?? null}</div>
     </div>
   );
 }
