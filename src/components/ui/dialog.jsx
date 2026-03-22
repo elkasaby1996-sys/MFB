@@ -2,7 +2,6 @@
 
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
-import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -43,11 +42,14 @@ const DialogContent = React.forwardRef(({ className, children, ...props }, ref) 
         ref={ref}
         aria-describedby={hasDescription ? ariaDescribedBy : undefined}
         className={cn(
-          "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-          "max-h-[85vh] overflow-y-auto",
+          "fixed inset-x-0 bottom-0 z-50 grid w-full gap-4 border bg-background p-0 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom rounded-t-[28px] max-h-[92dvh] overflow-hidden safe-bottom safe-x keyboard-sheet",
+          "sm:left-[50%] sm:top-[50%] sm:bottom-auto sm:max-w-lg sm:translate-x-[-50%] sm:translate-y-[-50%] sm:gap-4 sm:rounded-lg sm:p-6 sm:max-h-[85vh] sm:overflow-y-auto sm:data-[state=closed]:zoom-out-95 sm:data-[state=open]:zoom-in-95 sm:data-[state=closed]:slide-out-to-left-1/2 sm:data-[state=closed]:slide-out-to-top-[48%] sm:data-[state=open]:slide-in-from-left-1/2 sm:data-[state=open]:slide-in-from-top-[48%]",
           className
         )}
         {...contentProps}>
+        <div className="sm:hidden flex justify-center pt-3 pb-2">
+          <div className="h-1 w-10 rounded-full bg-slate-700" />
+        </div>
         {!hasTitle && <DialogTitle className="sr-only">Dialog</DialogTitle>}
         {children}
       </DialogPrimitive.Content>

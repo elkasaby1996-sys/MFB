@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Check, X, ArrowLeft } from 'lucide-react';
-import { TIER_FEATURES, TIER_PRICING } from '@/components/subscription/FEATURE_MAP';
+import SegmentedControl from '@/components/ui/SegmentedControl';
+import { TIER_FEATURES } from '@/components/subscription/FEATURE_MAP';
 import { BillingProvider } from '@/components/billing/BillingProvider';
 
 export default function PricingPage() {
@@ -68,26 +69,17 @@ export default function PricingPage() {
 
           {/* Billing Toggle */}
           <div className="flex flex-col items-center justify-center gap-3 mt-8 pt-4">
-            <div className="flex items-center justify-center gap-4">
-              <span className={`text-sm font-medium ${billingCycle === 'monthly' ? 'text-white' : 'text-slate-400'}`}>
-                Monthly
-              </span>
-              <button
-                onClick={() => setBillingCycle(billingCycle === 'monthly' ? 'yearly' : 'monthly')}
-                className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                  billingCycle === 'yearly' ? 'bg-pink-500' : 'bg-slate-700'
-                }`}
-              >
-                <span
-                  className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                    billingCycle === 'yearly' ? 'translate-x-7' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className={`text-sm font-medium ${billingCycle === 'yearly' ? 'text-white' : 'text-slate-400'}`}>
-                Yearly
-              </span>
-            </div>
+            <SegmentedControl
+              value={billingCycle}
+              onValueChange={setBillingCycle}
+              ariaLabel="Billing cycle"
+              className="w-full max-w-xs"
+              fullWidth
+              options={[
+                { value: 'monthly', label: 'Monthly' },
+                { value: 'yearly', label: 'Yearly', badge: 'Save 20%' },
+              ]}
+            />
             {billingCycle === 'yearly' && (
               <span className="px-3 py-1 bg-green-500/20 text-green-400 text-xs font-semibold rounded-full">
                 Save ~20%

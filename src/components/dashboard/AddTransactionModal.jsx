@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Sheet, SheetContent } from "@/components/ui/sheet";
+import SegmentedControl from '@/components/ui/SegmentedControl';
 import MobileSelect from '@/components/ui/MobileSelect';
 import { Input } from "@/components/ui/input";
 import MobileDatePicker from '@/components/ui/MobileDatePicker';
@@ -13,6 +14,7 @@ import { ArrowUpRight, ArrowDownRight } from "lucide-react";
 import { toast } from 'sonner';
 import { PRIMARY_CATEGORIES, HOME_SUBCATEGORIES, INCOME_CATEGORIES, validateCategoryStructure } from '@/components/utils/categoryConstants';
 import { useErrorHandler } from '@/hooks/useErrorHandler';
+import { nativeHaptics } from '@/lib/native';
 
 export default function AddTransactionModal({ isOpen, onClose, profile, initialType = 'expense' }) {
   const queryClient = useQueryClient();
@@ -68,7 +70,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
       queryClient.invalidateQueries({ queryKey: ['budgets'] });
       queryClient.invalidateQueries({ queryKey: ['savingsGoals'] });
       queryClient.invalidateQueries({ queryKey: ['debts'] });
-      if (navigator.vibrate) navigator.vibrate(10);
+      nativeHaptics.notifySuccess();
       toast.success('Transaction added successfully!');
       handleClose();
     }
@@ -164,6 +166,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
   };
 
   const handleTypeChange = (type) => {
+    nativeHaptics.selection();
     setTransactionType(type);
     setFormData((prev) => ({ ...prev, category: '', subCategory: '', category_icon: '', savings_goal_id: '', debt_id: '' }));
     setCategoryError(false);
@@ -186,18 +189,17 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
           <div className="flex-1 overflow-y-auto px-5 py-5 space-y-5">
 
             {/* Type Toggle */}
-            <div className="flex gap-3">
-              <button type="button" onClick={() => handleTypeChange('expense')}
-              className={`flex-1 py-4 px-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 min-h-[56px] active:scale-[0.98] ${transactionType === 'expense' ? 'bg-red-500/20 text-red-400 ring-2 ring-red-500' : 'bg-slate-800 text-slate-400'}`}>
-                <ArrowDownRight className="w-6 h-6" />
-                <span className="font-semibold text-base">Expense</span>
-              </button>
-              <button type="button" onClick={() => handleTypeChange('income')}
-              className={`flex-1 py-4 px-4 rounded-2xl transition-all duration-200 flex items-center justify-center gap-2 min-h-[56px] active:scale-[0.98] ${transactionType === 'income' ? 'bg-green-500/20 text-green-400 ring-2 ring-green-500' : 'bg-slate-800 text-slate-400'}`}>
-                <ArrowUpRight className="w-6 h-6" />
-                <span className="font-semibold text-base">Income</span>
-              </button>
-            </div>
+            <SegmentedControl
+              value={transactionType}
+              onValueChange={handleTypeChange}
+              size="lg"
+              fullWidth
+              ariaLabel="Transaction type"
+              options={[
+                { value: 'expense', label: 'Expense', icon: ArrowDownRight, className: transactionType === 'expense' ? '!text-rose-600' : undefined },
+                { value: 'income', label: 'Income', icon: ArrowUpRight, className: transactionType === 'income' ? '!text-emerald-600' : undefined },
+              ]}
+            />
 
             {/* Amount */}
             <div>
@@ -300,7 +302,7 @@ export default function AddTransactionModal({ isOpen, onClose, profile, initialT
 
           {/* Sticky Footer */}
           <div className="flex-shrink-0 border-t border-slate-800 bg-slate-950 px-5 py-4" style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 16px)' }}>
-            <NeonButton type="submit" loading={createMutation.isPending} disabled={!formData.amount || !formData.category} className="w-full min-h-[52px] text-base font-semibold">
+            <NeonButton type="submit" haptic="confirm" loading={createMutation.isPending} disabled={!formData.amount || !formData.category} className="w-full min-h-[52px] text-base font-semibold">
               Add Transaction
             </NeonButton>
           </div>

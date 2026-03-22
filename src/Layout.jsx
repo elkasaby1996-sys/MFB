@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useLocation } from 'react-router-dom';
 import './globals.css';
 import { LanguageProvider } from '@/components/i18n/LanguageProvider';
 import { PremiumProvider } from '@/components/providers/PremiumProvider';
@@ -9,12 +8,12 @@ import { ErrorBoundary } from '@/components/providers/ErrorBoundary';
 import { NetworkStatusProvider } from '@/components/providers/NetworkStatusProvider';
 import { NavigationProvider } from '@/components/providers/NavigationProvider';
 import OfflineBanner from '@/components/providers/OfflineBanner';
-import FloatingActionButton from '@/components/ui/FloatingActionButton';
 import QuickAddSheet from '@/components/ui/QuickAddSheet';
 import AddTransactionModal from '@/components/dashboard/AddTransactionModal';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { isNativePlatform } from '@/lib/native';
+import { useKeyboardAwareLayout } from '@/hooks/useKeyboardAwareLayout';
 
 
 function useIOSPWASetup() {
@@ -44,14 +43,12 @@ function useIOSPWASetup() {
     // Prevent bounce/overscroll on iOS
     document.body.style.overscrollBehavior = 'none';
     document.documentElement.style.overscrollBehavior = 'none';
-    if (isNativePlatform()) {
-      document.body.classList.add('native-app');
-    }
   }, []);
 }
 
 export default function Layout({ children, currentPageName }) {
   useIOSPWASetup();
+  useKeyboardAwareLayout();
   const [showQuickAdd, setShowQuickAdd] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [transactionType, setTransactionType] = useState('expense');
@@ -60,12 +57,6 @@ export default function Layout({ children, currentPageName }) {
     queryFn: () => base44.entities.UserProfile.list(),
   });
   const profile = profiles?.[0];
-
-  // Hide FAB during onboarding and upgrade screen
-  const showFAB = currentPageName !== 'Onboarding' 
-    && currentPageName !== 'Paywall'
-    && currentPageName !== 'AIAssistant'
-    && profile?.onboarding_completed;
 
   // Listen for quickAddClick event from BottomNav
   useEffect(() => {
@@ -82,17 +73,19 @@ export default function Layout({ children, currentPageName }) {
             <NavigationProvider>
               <LanguageProvider>
                 <OfflineBanner />
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={currentPageName}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -8 }}
-                    transition={{ duration: 0.18, ease: 'easeOut' }}
-                  >
-                    {children}
-                  </motion.div>
-                </AnimatePresence>
+                <div className="app-shell">
+                  <AnimatePresence mode="wait">
+                    <motion.div
+                      key={currentPageName}
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -8 }}
+                      transition={{ duration: 0.18, ease: 'easeOut' }}
+                    >
+                      {children}
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
                 {/* FAB moved to BottomNav */}
                 <QuickAddSheet 
                   isOpen={showQuickAdd} 

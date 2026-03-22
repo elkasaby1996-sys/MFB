@@ -3,6 +3,7 @@ import { formatMoney } from '@/components/utils/formatMoney';
 import NeonCard from '@/components/ui/NeonCard';
 import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart } from 'recharts';
 import { format } from 'date-fns';
+import SegmentedControl from '@/components/ui/SegmentedControl';
 
 export default function NetWorthChart({ data, currency = 'USD', timeRange, onTimeRangeChange }) {
   // Aggregate data by month — keep the last entry per month
@@ -26,21 +27,14 @@ export default function NetWorthChart({ data, currency = 'USD', timeRange, onTim
     <NeonCard className="p-5" glowColor="purple">
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-white font-semibold">Net Worth Over Time</h3>
-        <div className="flex gap-1">
-          {timeRanges.map(range => (
-            <button
-              key={range.value}
-              onClick={() => onTimeRangeChange(range.value)}
-              className={`px-3 py-1 rounded-lg text-xs font-medium transition-all active:scale-95 ${
-                timeRange === range.value
-                  ? 'bg-purple-500 text-white'
-                  : 'bg-slate-800 text-slate-400 active:bg-slate-700'
-              }`}
-            >
-              {range.label}
-            </button>
-          ))}
-        </div>
+        <SegmentedControl
+          value={timeRange}
+          onValueChange={onTimeRangeChange}
+          size="sm"
+          ariaLabel="Net worth time range"
+          className="max-w-[260px]"
+          options={timeRanges}
+        />
       </div>
 
       <div className="h-64">
