@@ -61,9 +61,3 @@ swift/
 
 - Original JavaScript/React code remains unchanged.
 - All new native iOS work stays in this `swift/` folder.
-
-
-## Xcode integration note
-
-- Use `MFBNativeApp.swift` as the app entry file for this native module to avoid collisions with Xcode template files named `MFBApp.swift`.
-- If your Xcode project already has a template `MFBApp.swift`, remove it from the target membership or delete it.
